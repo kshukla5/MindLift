@@ -3,6 +3,7 @@ import UserList from './components/UserList';
 import SignupForm from './components/SignupForm';
 import LoginForm from './components/LoginForm';
 import VideoGrid from './components/VideoGrid';
+import MyLibrary from './components/MyLibrary';
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -21,6 +22,7 @@ function App() {
       <LoginForm />
       <UserList users={users} />
       <VideoGrid />
+      <MyLibrary />
     </div>
   );
 }

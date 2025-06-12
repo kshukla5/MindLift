@@ -10,7 +10,8 @@ function LoginForm() {
     e.preventDefault();
     try {
       const res = await axios.post('/api/login', { email, password });
-      setMessage(`Login success: ${res.data.token}`);
+      localStorage.setItem('token', res.data.token);
+      setMessage('Login success');
     } catch (err) {
       const msg = err.response?.data?.error || 'Login failed';
       setMessage(msg);
