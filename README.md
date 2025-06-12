@@ -46,6 +46,11 @@ Additional authentication routes are available:
 
 - `POST /api/signup` – create an account (roles: `speaker`, `subscriber`, or `admin`).
 - `POST /api/login` – obtain a JWT for authenticated requests.
+- `GET /api/speakers` – list all speaker profiles.
+- `POST /api/speakers` – create a speaker profile (admin only).
+- `GET /api/speakers/:id` – fetch a single speaker profile.
+- `PUT /api/speakers/:id` – update a speaker profile (admin only).
+- `DELETE /api/speakers/:id` – remove a speaker profile (admin only).
 
 ### Frontend
 
