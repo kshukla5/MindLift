@@ -11,7 +11,8 @@ function SignupForm() {
     e.preventDefault();
     try {
       const res = await axios.post('/api/signup', { name, email, password });
-      setMessage(`Signup success: ${res.data.token}`);
+      localStorage.setItem('token', res.data.token);
+      setMessage('Signup success');
     } catch (err) {
       const msg = err.response?.data?.error || 'Signup failed';
       setMessage(msg);
