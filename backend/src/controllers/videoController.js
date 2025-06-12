@@ -11,6 +11,16 @@ const VideoController = {
     }
   },
 
+  async listUnapproved(req, res) {
+    try {
+      const videos = await VideoModel.getUnapprovedVideos();
+      res.json(videos);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch videos' });
+    }
+  },
+
   async getById(req, res) {
     try {
       const video = await VideoModel.getVideoById(req.params.id);
@@ -36,6 +46,20 @@ const VideoController = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to upload video' });
+    }
+  },
+
+  async updateApproval(req, res) {
+    try {
+      const { approved } = req.body;
+      const video = await VideoModel.updateApproval(req.params.id, approved);
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+      res.json(video);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to update status' });
     }
   },
 };

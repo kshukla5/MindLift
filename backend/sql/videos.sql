@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS videos (
   description TEXT,
   category TEXT,
   video_url TEXT NOT NULL,
+  approved BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
