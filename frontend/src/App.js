@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import UserList from './components/UserList';
+import SignupForm from './components/SignupForm';
+import LoginForm from './components/LoginForm';
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -14,6 +16,8 @@ function App() {
   return (
     <div>
       <h1>MindLift Users</h1>
+      <SignupForm />
+      <LoginForm />
       <UserList users={users} />
     </div>
   );
