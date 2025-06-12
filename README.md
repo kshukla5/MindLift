@@ -12,6 +12,8 @@ cp .env.example .env
 
 The configuration loader in `config.js` reads these variables securely and exposes them for use in the project.
 
+The `.env` file now includes settings for the email server used by NodeMailer. Set `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM` to enable subscription confirmation emails.
+
 ## Running the Example
 
 To see the configuration loader in action, run:
