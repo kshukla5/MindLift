@@ -4,6 +4,7 @@ const speakerRoutes = require('./routes/speakerRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const bookmarkRoutes = require('./routes/bookmarkRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const PaymentController = require('./controllers/paymentController');
 
 const app = express();
@@ -18,5 +19,6 @@ app.use('/api', speakerRoutes);
 app.use('/api', videoRoutes);
 app.use('/api', bookmarkRoutes);
 app.use('/api', paymentRoutes);
+app.use('/api', adminRoutes);
 
 module.exports = app;
