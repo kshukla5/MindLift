@@ -4,6 +4,7 @@ import SignupForm from './components/SignupForm';
 import LoginForm from './components/LoginForm';
 import VideoGrid from './components/VideoGrid';
 import MyLibrary from './components/MyLibrary';
+import AdminDashboard from './components/AdminDashboard';
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -23,6 +24,7 @@ function App() {
       <UserList users={users} />
       <VideoGrid />
       <MyLibrary />
+      <AdminDashboard />
     </div>
   );
 }
