@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import API_URL from '../api';
 
 function SignupForm() {
   const [name, setName] = useState('');
@@ -10,7 +11,7 @@ function SignupForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/signup', { name, email, password });
+      const res = await axios.post(`${API_URL}/api/signup`, { name, email, password });
       localStorage.setItem('token', res.data.token);
       setMessage('Signup success');
     } catch (err) {
