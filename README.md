@@ -42,6 +42,11 @@ frontend/    React application (components, pages)
 
 The backend exposes an `/api/users` endpoint that queries a `users` table from PostgreSQL. Edit the database credentials in `backend/src/config/db.js` to match your environment.
 
+Additional authentication routes are available:
+
+- `POST /api/signup` – create an account (roles: `speaker`, `subscriber`, or `admin`).
+- `POST /api/login` – obtain a JWT for authenticated requests.
+
 ### Frontend
 
 The React frontend fetches users from the API and renders them. Run the frontend and backend separately or behind a proxy. Both projects have their own `package.json` with typical npm scripts.
