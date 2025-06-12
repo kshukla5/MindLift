@@ -51,6 +51,8 @@ Additional authentication routes are available:
 - `GET /api/speakers/:id` – fetch a single speaker profile.
 - `PUT /api/speakers/:id` – update a speaker profile (admin only).
 - `DELETE /api/speakers/:id` – remove a speaker profile (admin only).
+- `POST /api/videos` – upload a video file or provide a YouTube/Vimeo URL (speakers and admins).
+- `GET /api/videos` – list uploaded videos.
 
 ### Frontend
 
@@ -59,7 +61,7 @@ The React frontend fetches users from the API and renders them. Run the frontend
 ## Getting Started
 
 1. Install dependencies in both `backend` and `frontend` directories.
-2. Configure PostgreSQL and create a `users` table.
+2. Configure PostgreSQL and create a `users` table. Run `backend/sql/videos.sql` to create the `videos` table.
 3. Start the backend (`npm run dev`) and frontend (`npm start`).
 
 This setup is intentionally minimal and serves as a starting point for further development.
