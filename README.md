@@ -61,7 +61,7 @@ The React frontend fetches users from the API and renders them. Run the frontend
 ## Getting Started
 
 1. Install dependencies in both `backend` and `frontend` directories.
-2. Configure PostgreSQL and create a `users` table. Run `backend/sql/videos.sql` to create the `videos` table.
+2. Configure PostgreSQL and create the required tables using the SQL files in `backend/sql` (`users.sql` and `videos.sql`).
 3. Start the backend (`npm run dev`) and frontend (`npm start`).
 
 This setup is intentionally minimal and serves as a starting point for further development.
