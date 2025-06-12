@@ -28,6 +28,10 @@ const VideoModel = {
     const result = await pool.query('UPDATE videos SET approved = $1 WHERE id = $2 RETURNING id, approved', [approved, id]);
     return result.rows[0];
   },
+
+  async deleteVideo(id) {
+    await pool.query('DELETE FROM videos WHERE id = $1', [id]);
+  },
 };
 
 module.exports = VideoModel;
