@@ -9,7 +9,7 @@ const UserModel = {
   async createUser({ name, email, password, role }) {
     const result = await pool.query(
       'INSERT INTO users (name, email, password, role, status) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, role, status',
-      [name, email, password, role, 'unpaid']
+      [name, email, password, role, 'paid']
     );
     return result.rows[0];
   },

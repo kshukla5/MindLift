@@ -25,6 +25,10 @@ function getEnv(name) {
   return process.env[name];
 }
 
+function getEnvOptional(name, defaultValue = '') {
+  return process.env[name] || defaultValue;
+}
+
 module.exports = {
   db: {
     host: getEnv('DB_HOST'),
@@ -35,7 +39,7 @@ module.exports = {
   },
   jwtSecret: getEnv('JWT_SECRET'),
   stripe: {
-    publicKey: getEnv('STRIPE_PUBLIC_KEY'),
-    secretKey: getEnv('STRIPE_SECRET_KEY'),
+    publicKey: getEnvOptional('STRIPE_PUBLIC_KEY'),
+    secretKey: getEnvOptional('STRIPE_SECRET_KEY'),
   },
 };
