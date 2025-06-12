@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || '');
 const UserModel = require('../models/userModel');
+const mailer = require('../config/mailer');
 
 const PaymentController = {
   async subscribe(req, res) {
@@ -46,6 +47,19 @@ const PaymentController = {
       if (event.type === 'payment_intent.succeeded') {
         if (userId) {
           await UserModel.updateStatus(userId, 'paid');
+          const user = await UserModel.findById(userId);
+          if (user && user.email) {
+            try {
+              await mailer.sendMail({
+                from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                to: user.email,
+                subject: 'Subscription Confirmed',
+                text: 'Your subscription is active. Thank you for choosing MindLift!',
+              });
+            } catch (emailErr) {
+              console.error('Failed to send confirmation email:', emailErr);
+            }
+          }
         }
       } else if (event.type === 'payment_intent.payment_failed') {
         if (userId) {
