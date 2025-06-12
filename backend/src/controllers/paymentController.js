@@ -14,15 +14,50 @@ const PaymentController = {
         currency: 'usd',
         description: 'Monthly subscription',
         automatic_payment_methods: { enabled: true },
+        metadata: { userId },
       });
-
-      await UserModel.updateStatus(userId, 'paid');
 
       res.json({ clientSecret: intent.client_secret });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to initiate payment' });
     }
+  },
+
+  async webhook(req, res) {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET || ''
+      );
+    } catch (err) {
+      console.error('Webhook signature verification failed.', err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    const intent = event.data.object;
+    const userId = intent.metadata && intent.metadata.userId;
+
+    try {
+      if (event.type === 'payment_intent.succeeded') {
+        if (userId) {
+          await UserModel.updateStatus(userId, 'paid');
+        }
+      } else if (event.type === 'payment_intent.payment_failed') {
+        if (userId) {
+          await UserModel.updateStatus(userId, 'unpaid');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to update user status:', err);
+      return res.status(500).end();
+    }
+
+    res.json({ received: true });
   },
 };
 
