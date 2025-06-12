@@ -53,6 +53,7 @@ Additional authentication routes are available:
 - `DELETE /api/speakers/:id` – remove a speaker profile (admin only).
 - `POST /api/videos` – upload a video file or provide a YouTube/Vimeo URL (speakers and admins).
 - `GET /api/videos` – list uploaded videos.
+- `POST /api/webhook` – Stripe event receiver for subscription updates.
 
 ### Frontend
 
