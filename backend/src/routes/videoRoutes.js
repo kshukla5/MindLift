@@ -23,5 +23,6 @@ router.get('/videos/unapproved', authorizeRoles('admin'), VideoController.listUn
 router.get('/videos/:id', VideoController.getById);
 router.post('/videos', authorizeRoles('speaker', 'admin'), upload.single('videoFile'), VideoController.create);
 router.patch('/videos/:id/approval', authorizeRoles('admin'), VideoController.updateApproval);
+router.delete('/videos/:id', authorizeRoles('admin'), VideoController.remove);
 
 module.exports = router;

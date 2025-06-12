@@ -30,6 +30,29 @@ function AdminDashboard() {
       });
   }, []);
 
+  const handleApproval = async (id, approved) => {
+    const token = localStorage.getItem('token');
+    try {
+      if (approved) {
+        await axios.patch(
+          `/api/admin/videos/${id}/approval`,
+          { approved: true },
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+      } else {
+        await axios.delete(`/api/admin/videos/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+      setStats((prev) => ({
+        ...prev,
+        pendingVideos: prev.pendingVideos.filter((v) => v.id !== id),
+      }));
+    } catch (err) {
+      console.error('Failed to update video status', err);
+    }
+  };
+
   if (notAdmin) {
     return <p>Admin access required.</p>;
   }
@@ -63,7 +86,11 @@ function AdminDashboard() {
       ) : (
         <ul>
           {stats.pendingVideos.map((v) => (
-            <li key={v.id}>{v.title}</li>
+            <li key={v.id}>
+              {v.title}{' '}
+              <button onClick={() => handleApproval(v.id, true)}>Approve</button>{' '}
+              <button onClick={() => handleApproval(v.id, false)}>Reject</button>
+            </li>
           ))}
         </ul>
       )}

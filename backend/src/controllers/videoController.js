@@ -62,6 +62,16 @@ const VideoController = {
       res.status(500).json({ error: 'Failed to update status' });
     }
   },
+
+  async remove(req, res) {
+    try {
+      await VideoModel.deleteVideo(req.params.id);
+      res.sendStatus(204);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to delete video' });
+    }
+  },
 };
 
 module.exports = VideoController;
