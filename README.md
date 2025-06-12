@@ -1,3 +1,27 @@
+# MindLift
+MindLift is your daily dose of motivation, mindset mastery, and personal growth. Unlock your full potential with empowering content designed to elevate your thinking and transform your life.
+
+## Environment Setup
+
+Copy `.env.example` to `.env` and fill in the required values before running the application:
+
+```bash
+cp .env.example .env
+# edit .env with your secrets
+```
+
+The configuration loader in `config.js` reads these variables securely and exposes them for use in the project.
+
+## Running the Example
+
+To see the configuration loader in action, run:
+
+```bash
+node index.js
+```
+
+This script will print some of the loaded configuration values.
+=======
 # MindLift Full-Stack App
 
 This repository contains a simple full-stack web application organized with the **Model–View–Controller (MVC)** pattern.
@@ -29,3 +53,4 @@ The React frontend fetches users from the API and renders them. Run the frontend
 3. Start the backend (`npm run dev`) and frontend (`npm start`).
 
 This setup is intentionally minimal and serves as a starting point for further development.
+
