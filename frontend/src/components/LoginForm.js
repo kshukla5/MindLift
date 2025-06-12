@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import API_URL from '../api';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -9,7 +10,7 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/login', { email, password });
+      const res = await axios.post(`${API_URL}/api/login`, { email, password });
       localStorage.setItem('token', res.data.token);
       setMessage('Login success');
     } catch (err) {

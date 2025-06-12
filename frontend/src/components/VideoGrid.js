@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../api";
 import VideoPlayer from "./VideoPlayer";
 import "./VideoGrid.css";
 
@@ -15,13 +16,13 @@ function VideoGrid() {
     }
     try {
       if (isBookmarked) {
-        await axios.delete(`/api/bookmarks/${id}`, {
+        await axios.delete(`${API_URL}/api/bookmarks/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setBookmarkedIds(bookmarkedIds.filter((b) => b !== id));
       } else {
         await axios.post(
-          "/api/bookmarks",
+          `${API_URL}/api/bookmarks`,
           { videoId: id },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -35,7 +36,7 @@ function VideoGrid() {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const res = await axios.get("/api/videos");
+        const res = await axios.get(`${API_URL}/api/videos`);
         const approved = res.data.filter((v) => v.approved);
         const grouped = approved.reduce((acc, video) => {
           const cat = video.category || "Uncategorized";
@@ -52,7 +53,7 @@ function VideoGrid() {
     const token = localStorage.getItem("token");
     if (token) {
       axios
-        .get("/api/bookmarks", {
+        .get(`${API_URL}/api/bookmarks`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setBookmarkedIds(res.data.map((v) => v.id)))

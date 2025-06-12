@@ -5,12 +5,13 @@ import LoginForm from './components/LoginForm';
 import VideoGrid from './components/VideoGrid';
 import MyLibrary from './components/MyLibrary';
 import AdminDashboard from './components/AdminDashboard';
+import API_URL from './api';
 
 function App() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch('/api/users')
+    fetch(`${API_URL}/api/users`)
       .then(res => res.json())
       .then(data => setUsers(data))
       .catch(err => console.error(err));

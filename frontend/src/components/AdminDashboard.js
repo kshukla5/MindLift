@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import API_URL from '../api';
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -23,7 +24,7 @@ function AdminDashboard() {
       return;
     }
     axios
-      .get('/api/admin/stats', { headers: { Authorization: `Bearer ${token}` } })
+      .get(`${API_URL}/api/admin/stats`, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => setStats(res.data))
       .catch((err) => {
         setError(err.response?.data?.error || 'Failed to fetch stats');
@@ -35,12 +36,12 @@ function AdminDashboard() {
     try {
       if (approved) {
         await axios.patch(
-          `/api/admin/videos/${id}/approval`,
+          `${API_URL}/api/admin/videos/${id}/approval`,
           { approved: true },
           { headers: { Authorization: `Bearer ${token}` } },
         );
       } else {
-        await axios.delete(`/api/admin/videos/${id}`, {
+        await axios.delete(`${API_URL}/api/admin/videos/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }

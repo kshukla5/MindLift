@@ -69,3 +69,17 @@ The React frontend fetches users from the API and renders them. Run the frontend
 
 This setup is intentionally minimal and serves as a starting point for further development.
 
+## Deployment
+
+### Backend (Render)
+
+1. Create a new Web Service on [Render](https://render.com) using the `render.yaml` blueprint in this repository.
+2. Add the variables from `.env.production` to the service's environment settings.
+3. Deploy and note the public URL (e.g. `https://mindlift-backend.onrender.com`).
+
+### Frontend (Vercel)
+
+1. Import the project into [Vercel](https://vercel.com) and set the root directory to `frontend`.
+2. Define `REACT_APP_API_URL` in the Vercel dashboard pointing to the Render backend URL.
+3. Deploy to obtain the production frontend URL.
+
