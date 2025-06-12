@@ -14,6 +14,8 @@ The configuration loader in `config.js` reads these variables securely and expos
 
 The `.env` file now includes settings for the email server used by NodeMailer. Set `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM` to enable subscription confirmation emails.
 
+Stripe integration has been disabled so everyone can subscribe for free. The `/api/subscribe` endpoint simply marks a user as paid without processing a payment.
+
 ## Running the Example
 
 To see the configuration loader in action, run:
@@ -55,7 +57,7 @@ Additional authentication routes are available:
 - `DELETE /api/speakers/:id` – remove a speaker profile (admin only).
 - `POST /api/videos` – upload a video file or provide a YouTube/Vimeo URL (speakers and admins).
 - `GET /api/videos` – list uploaded videos.
-- `POST /api/webhook` – Stripe event receiver for subscription updates.
+- `POST /api/webhook` – placeholder endpoint (Stripe temporarily disabled).
 
 ### Frontend
 
