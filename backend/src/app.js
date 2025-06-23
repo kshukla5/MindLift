@@ -14,6 +14,11 @@ app.post('/api/webhook', express.raw({ type: 'application/json' }), PaymentContr
 
 app.use(express.json());
 
+// Optional: Add a handler for the root path
+app.get('/', (req, res) => {
+  res.send('MindLift API is running!');
+});
+
 app.use('/api', userRoutes);
 app.use('/api', speakerRoutes);
 app.use('/api', videoRoutes);

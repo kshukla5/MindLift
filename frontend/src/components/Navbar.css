@@ -1,0 +1,108 @@
+.navbar {
+  background: rgba(0, 0, 0, 0.3); /* Semi-transparent navbar */
+  backdrop-filter: blur(5px);
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  height: 80px;
+  z-index: 1;
+  width: 100%;
+  max-width: 1300px;
+  padding: 0 24px;
+  align-items: center;
+}
+
+.navbar-logo {
+  color: #fff;
+  justify-self: start;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  text-align: center;
+  margin-right: -22px; /* Adjust as needed */
+}
+
+.nav-item {
+  height: 80px;
+}
+
+.nav-links {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 0 1rem;
+  height: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-links:hover {
+  color: #17a2b8; /* A highlight color, adjust as needed */
+  border-bottom: 3px solid #17a2b8;
+}
+
+.nav-auth-links {
+  display: flex;
+  align-items: center;
+}
+
+.auth-link {
+  margin-left: 1rem;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.login-link {
+  border: 1px solid #fff;
+}
+
+.login-link:hover {
+  background-color: #fff;
+  color: #282c34; /* Your background color */
+  border-bottom: none;
+}
+
+.signup-link {
+  background-color: #17a2b8; /* A primary call-to-action color */
+  color: #fff;
+  border: 1px solid #17a2b8;
+}
+
+.signup-link:hover {
+  background-color: #138496;
+  border-color: #117a8b;
+  border-bottom: none;
+}
+
+/* Add media queries for responsiveness if needed */
+@media screen and (max-width: 960px) {
+  .nav-menu {
+    /* Adjust for smaller screens, e.g., hide or move to a hamburger menu */
+    display: none; 
+  }
+  .nav-auth-links {
+    /* Adjust auth links for smaller screens if necessary */
+  }
+}

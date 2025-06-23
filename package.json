@@ -1,18 +1,32 @@
 {
+  "name": "mindlift-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MindLift Application",
   "dependencies": {
-    "@prisma/client": "^6.9.0",
-    "bcrypt": "^6.0.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.1",
-    "pg": "^8.16.0",
-    "prisma": "^6.9.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-scripts": "^5.0.1",
+    "react-player": "^2.12.0",
     "stripe": "^18.2.1",
-    "react-player": "^2.12.0"
+    "jsonwebtoken": "^9.0.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
