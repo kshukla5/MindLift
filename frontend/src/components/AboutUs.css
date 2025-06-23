@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+
 .about-us {
   scroll-behavior: smooth;
   padding: 0;
   margin: 0;
+  font-family: 'Lato', sans-serif;
 }
 
 .about-hero {
@@ -18,6 +21,14 @@
 .hero-content h1 {
   font-size: 3rem;
   margin-bottom: 0.5rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.mission h2,
+.offer h2,
+.story h2,
+.cta h2 {
+  font-family: 'Playfair Display', serif;
 }
 
 .hero-content p {
@@ -35,6 +46,23 @@
 
 .scroll-down:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+.about-hero,
+.mission,
+.offer,
+.story,
+.cta {
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .mission,
