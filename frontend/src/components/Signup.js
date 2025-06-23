@@ -1,80 +1,102 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import API_URL from '../api.js';
+import './AuthForm.css';
 
 function Signup() {
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const initialRole = params.get('role') || '';
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [role, setRole] = useState(initialRole);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    setRole(initialRole);
+  }, [initialRole]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (password !== confirm) {
+      setError('Passwords do not match');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/api/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Signup failed');
+      }
+      const data = await res.json();
+      localStorage.setItem('token', data.token);
+      // Redirect or update app state here
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
-      <div className="bg-gray-800 text-white rounded-lg shadow-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-semibold mb-6 text-center">Create Your Account</h2>
-        <form>
-          <div className="mb-4">
-            <label htmlFor="name" className="block mb-1">Full Name</label>
-            <input
-              id="name"
-              type="text"
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              placeholder="Jane Doe"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="email" className="block mb-1">Email</label>
-            <input
-              id="email"
-              type="email"
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block mb-1">Password</label>
-            <input
-              id="password"
-              type="password"
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              placeholder="********"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="confirm" className="block mb-1">Confirm Password</label>
-            <input
-              id="confirm"
-              type="password"
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              placeholder="********"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="role" className="block mb-1">Role</label>
-            <select
-              id="role"
-              required
-              className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-            >
-              <option value="">Select role</option>
-              <option value="learner">Learner</option>
-              <option value="speaker">Speaker</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="flex items-center">
-              <input type="checkbox" required className="form-checkbox text-teal-500 mr-2" />
-              <span className="text-sm">
-                I agree to the{' '}
-                <a href="#" className="text-teal-400 hover:underline">Terms &amp; Conditions</a>
-              </span>
-            </label>
-          </div>
-          <button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-lg">
-            Sign Up
-          </button>
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <h2>Create Your Account</h2>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="name">Full Name</label>
+          <input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <label htmlFor="confirm">Confirm Password</label>
+          <input
+            id="confirm"
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+          />
+          <label htmlFor="role">Role</label>
+          <select
+            id="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            required
+          >
+            <option value="">Select role</option>
+            <option value="learner">Learner</option>
+            <option value="speaker">Speaker</option>
+          </select>
+          {error && <p className="error-text">{error}</p>}
+          <button type="submit">Sign Up</button>
         </form>
-        <p className="text-sm text-center mt-4">
-          Already have an account?{' '}
-          <Link to="/login" className="text-teal-400 hover:underline">Log In</Link>
+        <p className="footer-text">
+          Already have an account? <Link to="/login">Log In</Link>
         </p>
       </div>
     </div>
