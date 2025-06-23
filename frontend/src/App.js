@@ -1,29 +1,33 @@
 import React from 'react';
 import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
+import AboutUs from './components/AboutUs';
+import LoginForm from './components/LoginForm';
+import SignupForm from './components/SignupForm';
+import FeaturesPage from './components/FeaturesPage';
+import ContactPage from './components/ContactPage';
 import Footer from './components/Footer';
-// If you plan to use React Router for navigation:
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
-    // <Router> {/* Uncomment if using React Router for navigation */}
-    <div className="App">
-      <Navbar />
-      {/*
-        When you implement routing, your routes will go here.
-        For example:
-        <Routes>
-          <Route path="/" element={<HeroSection />} />
-          {/* <Route path="/login" element={<LoginForm />} /> ...other routes */ }
-        {/* </Routes> */}
-      <main className="main-content">
-        <HeroSection /> {/* This will be the content for your homepage path "/" */}
-      </main>
-      <Footer />
-    </div>
-    // </Router> {/* Uncomment if using React Router */}
+    <Router>
+      <div className="App">
+        <Navbar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<HeroSection />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/signup" element={<SignupForm />} />
+            <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

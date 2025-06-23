@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './HeroSection.css';
 
 function HeroSection() {
@@ -7,12 +8,12 @@ function HeroSection() {
       <h1>Elevate Your Mind</h1>
       <p>Discover tranquility and unlock your potential with MindLift.</p>
       <div className="hero-btns">
-        <a href="/signup" className="btn btn-primary btn-large">
+        <Link to="/signup" className="btn btn-primary btn-large">
           GET STARTED
-        </a>
-        <a href="/features" className="btn btn-outline btn-large">
+        </Link>
+        <Link to="/features" className="btn btn-outline btn-large">
           LEARN MORE <i className="far fa-play-circle" />
-        </a>
+        </Link>
       </div>
     </div>
   );
