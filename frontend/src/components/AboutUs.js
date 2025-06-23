@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './AboutUs.css';
 
 function AboutUs() {
@@ -53,12 +54,12 @@ function AboutUs() {
       <section id="cta" className="cta">
         <h2>Ready to elevate your journey?</h2>
         <div className="cta-buttons">
-          <a href="/signup?role=speaker" className="btn btn-primary">
+          <Link to="/signup?role=speaker" className="btn btn-primary">
             Become a Speaker
-          </a>
-          <a href="/signup" className="btn btn-outline">
+          </Link>
+          <Link to="/signup" className="btn btn-outline">
             Start Your Journey
-          </a>
+          </Link>
         </div>
       </section>
     </div>
