@@ -25,7 +25,7 @@ node index.js
 ```
 
 This script will print some of the loaded configuration values.
-=======
+
 # MindLift Full-Stack App
 
 This repository contains a simple full-stack web application organized with the **Model–View–Controller (MVC)** pattern.
@@ -65,9 +65,10 @@ The React frontend fetches users from the API and renders them. Run the frontend
 
 ## Getting Started
 
-1. Install dependencies in both `backend` and `frontend` directories.
-2. Configure PostgreSQL and create the required tables using the SQL files in `backend/sql` (`users.sql` and `videos.sql`).
-3. Start the backend (`npm run dev`) and frontend (`npm start`).
+1. Copy `.env.example` to `.env` and fill in the required variables.
+2. Install dependencies in both `backend` and `frontend` directories.
+3. Configure PostgreSQL and create the required tables using the SQL files in `backend/sql`.
+4. Start the backend (`npm run dev`) and frontend (`npm start`).
 
 This setup is intentionally minimal and serves as a starting point for further development.
 
