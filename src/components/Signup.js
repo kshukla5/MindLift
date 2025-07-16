@@ -1,61 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import API_URL from '../api.js';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './AuthForm.css';
+import { connectSocket } from '../services/socket';
 
 function Signup() {
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const initialRole = params.get('role') || '';
-
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [role, setRole] = useState(initialRole);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('learner');
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    setRole(initialRole);
-  }, [initialRole]);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (password !== confirm) {
-      setError('Passwords do not match');
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
       return;
     }
+    setIsLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/signup`, {
+      const res = await fetch('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role }),
       });
+
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Signup failed');
+        let errorMessage = `Signup failed with status: ${res.status}`;
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorMessage;
+        } else {
+          console.error("Received a non-JSON response from the server. This is often a proxy issue.");
+        }
+        throw new Error(errorMessage);
       }
+
       const data = await res.json();
       localStorage.setItem('token', data.token);
-      // Redirect or update app state here
+      connectSocket(data.token);
+
+      // Role-based redirection on signup
+      if (role === 'speaker') {
+        navigate('/speaker');
+      } else {
+        navigate('/dashboard');
+      }
+      window.location.reload(); // To ensure all components re-render with new auth state
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
-        <h2>Create Your Account</h2>
+        <h2>Create an Account</h2>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="name">Full Name</label>
+          <label htmlFor="name">Name</label>
           <input
             id="name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            disabled={isLoading}
           />
           <label htmlFor="email">Email</label>
           <input
@@ -64,6 +79,7 @@ function Signup() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={isLoading}
           />
           <label htmlFor="password">Password</label>
           <input
@@ -72,14 +88,16 @@ function Signup() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={isLoading}
           />
-          <label htmlFor="confirm">Confirm Password</label>
+          <label htmlFor="confirmPassword">Confirm Password</label>
           <input
-            id="confirm"
+            id="confirmPassword"
             type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            disabled={isLoading}
           />
           <label htmlFor="role">Role</label>
           <select
@@ -87,13 +105,15 @@ function Signup() {
             value={role}
             onChange={(e) => setRole(e.target.value)}
             required
+            disabled={isLoading}
           >
-            <option value="">Select role</option>
             <option value="learner">Learner</option>
             <option value="speaker">Speaker</option>
           </select>
           {error && <p className="error-text">{error}</p>}
-          <button type="submit">Sign Up</button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? 'Signing Up...' : 'Sign Up'}
+          </button>
         </form>
         <p className="footer-text">
           Already have an account? <Link to="/login">Log In</Link>

@@ -27,6 +27,18 @@ const UserModel = {
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     return result.rows[0];
   },
+
+  async updateUser(id, { name, email }) {
+    const result = await pool.query(
+      'UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING id, name, email, role, status',
+      [name, email, id]
+    );
+    return result.rows[0];
+  },
+
+  async deleteUser(id) {
+    await pool.query('DELETE FROM users WHERE id = $1', [id]);
+  },
 };
 
 module.exports = UserModel;

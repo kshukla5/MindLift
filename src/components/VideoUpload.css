@@ -1,0 +1,129 @@
+.video-upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Align to top */
+  min-height: calc(100vh - 160px);
+  padding: 40px 20px;
+  background: linear-gradient(180deg, #0e0f10, #34393f);
+  color: #fff;
+}
+
+.video-upload-card {
+  background: rgba(0, 0, 0, 0.75);
+  padding: 40px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px; /* A bit wider for more fields */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.video-upload-card h2 {
+  margin-top: 0;
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.video-upload-card p {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #ccc;
+}
+
+.video-upload-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.video-upload-card label {
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.video-upload-card input,
+.video-upload-card textarea {
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background-color: #282c34;
+  color: #fff;
+  font-family: inherit; /* Ensure textarea uses the same font */
+}
+
+.video-upload-card textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.video-upload-card input[type="file"] {
+    padding: 8px;
+}
+
+.video-upload-card input:focus,
+.video-upload-card textarea:focus {
+  outline: none;
+  border-color: #17a2b8;
+  box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.3);
+}
+
+.video-upload-card button {
+  background-color: #17a2b8;
+  color: #fff;
+  padding: 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.video-upload-card button:hover:not(:disabled) {
+  background-color: #138496;
+}
+
+.video-upload-card button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+.success-text, .error-text {
+  margin-bottom: 16px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.error-text {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.success-text {
+  color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.1);
+}
+
+.input-hint {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: -12px;
+  margin-bottom: 16px;
+}
+
+.upload-type-selector {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  background-color: #282c34;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.upload-type-selector label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}

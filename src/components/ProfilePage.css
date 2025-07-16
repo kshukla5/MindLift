@@ -1,0 +1,116 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: calc(100vh - 160px);
+  padding: 40px 20px;
+  background: linear-gradient(180deg, #0e0f10, #34393f);
+  color: #fff;
+}
+
+.profile-content-wrapper {
+  width: 100%;
+  max-width: 600px;
+}
+
+.profile-card {
+  background: rgba(0, 0, 0, 0.75);
+  padding: 40px;
+  border-radius: 8px;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  margin-bottom: 30px;
+}
+
+.profile-card h2 {
+  margin-top: 0;
+  text-align: center;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.profile-card .form-group {
+  margin-bottom: 20px;
+}
+
+.profile-card label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.profile-card input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background-color: #282c34;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.profile-card input:disabled {
+  background-color: #20232a;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.profile-actions {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.profile-actions button {
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: 600;
+}
+
+.btn-edit {
+  background-color: #17a2b8;
+}
+.btn-edit:hover {
+  background-color: #138496;
+}
+
+.btn-save {
+  background-color: #28a745;
+}
+.btn-save:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+}
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+.profile-actions button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.error-text, .success-text {
+  margin-bottom: 16px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.error-text {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.success-text {
+  color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.1);
+}

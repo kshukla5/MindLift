@@ -32,6 +32,14 @@ const VideoModel = {
   async deleteVideo(id) {
     await pool.query('DELETE FROM videos WHERE id = $1', [id]);
   },
+
+  async updateVideo(id, { title, description, category }) {
+    const result = await pool.query(
+      'UPDATE videos SET title = $1, description = $2, category = $3 WHERE id = $4 RETURNING id, title, description, category, video_url, approved, created_at',
+      [title, description, category, id]
+    );
+    return result.rows[0];
+  },
 };
 
 module.exports = VideoModel;

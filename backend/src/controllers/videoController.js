@@ -49,6 +49,20 @@ const VideoController = {
     }
   },
 
+  async update(req, res) {
+    try {
+      const { title, description, category } = req.body;
+      const video = await VideoModel.updateVideo(req.params.id, { title, description, category });
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+      res.json(video);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to update video' });
+    }
+  },
+
   async updateApproval(req, res) {
     try {
       const { approved } = req.body;

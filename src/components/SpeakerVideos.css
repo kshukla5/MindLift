@@ -1,0 +1,72 @@
+.speaker-videos-container {
+    padding: 20px;
+    color: #fff;
+}
+
+.video-list {
+    list-style: none;
+    padding: 0;
+}
+
+.video-list-item {
+    background-color: #282c34;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.video-title {
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+.video-status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0 15px;
+}
+
+.status-published {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-pending {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.video-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none; /* For Link component */
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #138496;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}

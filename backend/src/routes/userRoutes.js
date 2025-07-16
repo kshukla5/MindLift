@@ -7,5 +7,7 @@ const authorizeRoles = require('../middleware/authMiddleware');
 router.get('/users', authorizeRoles('admin'), UserController.list);
 router.post('/signup', UserController.signup);
 router.post('/login', UserController.login);
+router.put('/:id', UserController.update);
+router.delete('/:id', UserController.remove);
 
 module.exports = router;
