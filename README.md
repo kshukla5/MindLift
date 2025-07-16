@@ -1,88 +1,204 @@
 # MindLift
 MindLift is your daily dose of motivation, mindset mastery, and personal growth. Unlock your full potential with empowering content designed to elevate your thinking and transform your life.
 
-## Environment Setup
-
-Copy `.env.example` to `.env` and fill in the required values before running the application:
+## 🚀 Quick Start
 
 ```bash
-cp .env.example .env
-# edit .env with your secrets
+# Clone the repository
+git clone https://github.com/skywardcloud/MindLift.git
+cd MindLift
+
+# Run the automated setup
+npm run setup
+
+# Edit .env with your database credentials
+# Then set up the database:
+createdb mindlift
+psql -d mindlift -f backend/sql/schema.sql
+
+# Start the application
+npm run dev
 ```
 
-The configuration loader in `config.js` reads these variables securely and exposes them for use in the project.
+Visit http://localhost:3000 to view the application.
 
-The `.env` file now includes settings for the email server used by NodeMailer. Set `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS`, and `EMAIL_FROM` to enable subscription confirmation emails.
+## 📋 Environment Setup
 
-Stripe integration has been disabled so everyone can subscribe for free. The `/api/subscribe` endpoint simply marks a user as paid without processing a payment.
+### Required Environment Variables
 
-## Running the Example
+1. **Create your environment file:**
+   ```bash
+   cp .env.example .env
+   ```
 
-To see the configuration loader in action, run:
+2. **Edit the `.env` file** with your actual values:
+   - Database credentials (PostgreSQL)
+   - JWT secret key
+   - Email server settings (for NodeMailer)
+   - Stripe keys (if you want to re-enable payments)
 
-```bash
-node index.js
-```
+3. **Required environment variables:**
+   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - PostgreSQL database configuration
+   - `JWT_SECRET` - Secret key for JWT token signing
+   - `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS`, `EMAIL_FROM` - Email server configuration
 
-This script will print some of the loaded configuration values.
+**Note:** Stripe integration is currently disabled, so all users can subscribe for free. The `/api/subscribe` endpoint simply marks users as paid without processing payments.
 
-# MindLift Full-Stack App
-
-This repository contains a simple full-stack web application organized with the **Model–View–Controller (MVC)** pattern.
-
-## Technologies
+## 🏗️ Technologies
 
 - **Backend**: [Node.js](https://nodejs.org/) with [Express](https://expressjs.com/) and [PostgreSQL](https://www.postgresql.org/)
-- **Frontend**: [React](https://react.dev/)
+- **Frontend**: [React](https://react.dev/) with React Router
+- **Authentication**: JWT-based authentication with role-based access control
+- **Real-time**: WebSocket support for live features
+- **Testing**: Jest for backend testing
+- **Deployment**: Render (backend) and Vercel (frontend)
 
-## Folder Structure
+## 📁 Project Structure
 
 ```
-backend/     Express API (models, controllers, routes)
-frontend/    React application (components, pages)
+MindLift/
+├── backend/                 # Express API server
+│   ├── src/
+│   │   ├── controllers/     # Request handlers
+│   │   ├── models/         # Database models
+│   │   ├── routes/         # API routes
+│   │   ├── middleware/     # Authentication & other middleware
+│   │   ├── config/         # Database & email configuration
+│   │   ├── app.js          # Express application setup
+│   │   └── server.js       # Server entry point with WebSocket
+│   ├── sql/                # Database schema and seed files
+│   └── tests/              # Backend tests
+├── frontend/               # React application
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── pages/         # Page components
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── services/      # API services
+│   │   └── App.js         # Main app component
+│   └── public/           # Static assets
+├── .env.example           # Environment variables template
+├── .env.production        # Production environment template
+└── setup.sh              # Automated setup script
 ```
 
-### Backend
+## 🔧 Features
 
-The backend exposes an `/api/users` endpoint that queries a `users` table from PostgreSQL. Edit the database credentials in `backend/src/config/db.js` to match your environment.
+### User Management
+- **Three user roles**: Speaker, Subscriber, Admin
+- **JWT Authentication**: Secure token-based authentication
+- **Profile Management**: User profiles with customizable settings
 
-Additional authentication routes are available:
+### Video Platform
+- **Video Upload**: Support for file uploads and YouTube/Vimeo URLs
+- **Video Management**: CRUD operations for video content
+- **Categorization**: Organize videos by categories
+- **Approval System**: Admin approval for uploaded content
 
-- `POST /api/signup` – create an account (roles: `speaker`, `subscriber`, or `admin`).
-- `POST /api/login` – obtain a JWT for authenticated requests.
-- `GET /api/speakers` – list all speaker profiles.
-- `POST /api/speakers` – create a speaker profile (admin only).
-- `GET /api/speakers/:id` – fetch a single speaker profile.
-- `PUT /api/speakers/:id` – update a speaker profile (admin only).
-- `DELETE /api/speakers/:id` – remove a speaker profile (admin only).
-- `POST /api/videos` – upload a video file or provide a YouTube/Vimeo URL (speakers and admins).
-- `GET /api/videos` – list uploaded videos.
-- `POST /api/webhook` – placeholder endpoint (Stripe temporarily disabled).
+### Speaker System
+- **Speaker Profiles**: Dedicated profiles for content creators
+- **Speaker Dashboard**: Tools for content management
+- **Bio & Social Links**: Rich speaker profiles with social media integration
 
-### Frontend
+### Admin Features
+- **Admin Dashboard**: Comprehensive content and user management
+- **User Management**: View and manage all users
+- **Content Moderation**: Approve/reject uploaded videos
+- **Analytics**: Basic usage statistics
 
-The React frontend fetches users from the API and renders them. Run the frontend and backend separately or behind a proxy. Both projects have their own `package.json` with typical npm scripts.
+### Additional Features
+- **Bookmarking**: Users can bookmark favorite videos
+- **Real-time Communication**: WebSocket-based live features
+- **Responsive Design**: Mobile-friendly interface
+- **Email Integration**: NodeMailer for notifications
 
-## Getting Started
+## 🛠️ Development Commands
 
-1. Copy `.env.example` to `.env` and fill in the required variables.
-2. Install dependencies in both `backend` and `frontend` directories.
-3. Configure PostgreSQL and create the required tables using the SQL files in `backend/sql`.
-4. Start the backend (`npm run dev`) and frontend (`npm start`).
+```bash
+# Setup and installation
+npm run setup              # Run automated setup script
+npm run install-all        # Install all dependencies manually
 
-This setup is intentionally minimal and serves as a starting point for further development.
+# Development
+npm run dev               # Start both backend and frontend
+npm run backend           # Start backend server only
+npm run frontend          # Start frontend development server
 
-## Deployment
+# Testing and building
+npm test                  # Run backend tests
+npm run build            # Build frontend for production
+```
+
+## 📖 API Endpoints
+
+### Authentication
+- `POST /api/signup` - Create new user account
+- `POST /api/login` - User login
+
+### Users
+- `GET /api/users` - Get all users (admin only)
+
+### Speakers
+- `GET /api/speakers` - List all speakers
+- `POST /api/speakers` - Create speaker profile (admin only)
+- `GET /api/speakers/:id` - Get single speaker
+- `PUT /api/speakers/:id` - Update speaker (admin only)
+- `DELETE /api/speakers/:id` - Delete speaker (admin only)
+
+### Videos
+- `GET /api/videos` - List all videos
+- `POST /api/videos` - Upload video (speakers/admins only)
+- `GET /api/videos/:id` - Get single video
+- `PUT /api/videos/:id` - Update video
+- `DELETE /api/videos/:id` - Delete video
+
+### Bookmarks
+- `GET /api/bookmarks` - Get user's bookmarks
+- `POST /api/bookmarks` - Add bookmark
+- `DELETE /api/bookmarks/:id` - Remove bookmark
+
+## 🗄️ Database Schema
+
+The application uses PostgreSQL with the following main tables:
+
+- **users**: User accounts with roles (speaker, subscriber, admin)
+- **speakers**: Speaker profiles with bio and social links
+- **videos**: Video content with metadata and approval status
+- **bookmarks**: User bookmarks for videos
+- **payments**: Payment records (currently disabled)
+
+## 🚀 Deployment
 
 ### Backend (Render)
-
-1. Create a new Web Service on [Render](https://render.com) using the `render.yaml` blueprint in this repository.
-2. Add the variables from `.env.production` to the service's environment settings.
-3. Deploy and note the public URL (e.g. `https://mindlift-backend.onrender.com`).
+1. Create a new Web Service on [Render](https://render.com)
+2. Connect your GitHub repository
+3. Set the root directory to `backend`
+4. Add environment variables from `.env.production`
+5. Deploy and note the public URL
 
 ### Frontend (Vercel)
+1. Import the project into [Vercel](https://vercel.com)
+2. Set the root directory to `frontend`
+3. Add `REACT_APP_API_URL` environment variable pointing to your backend URL
+4. Deploy to get the production frontend URL
 
-1. Import the project into [Vercel](https://vercel.com) and set the root directory to `frontend`.
-2. Define `REACT_APP_API_URL` in the Vercel dashboard pointing to the Render backend URL.
-3. Deploy to obtain the production frontend URL.
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Make your changes and test them
+4. Commit your changes: `git commit -m 'Add new feature'`
+5. Push to the branch: `git push origin feature/new-feature`
+6. Submit a pull request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support, email support@mindlift.com or create an issue on GitHub.
+
+---
+
+Built with ❤️ by the MindLift Team
 
