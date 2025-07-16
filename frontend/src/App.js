@@ -12,50 +12,22 @@ import MyLibrary from './components/MyLibrary';
 import VideoEdit from './components/VideoEdit';
 import ProfilePage from './components/ProfilePage';
 import VideoUpload from './components/VideoUpload';
+import HomePage from './components/HomePage';
+import SpeakerDashboard from './components/SpeakerDashboard';
+import LearnerDashboard from './components/LearnerDashboard';
 
 // Import components needed by our page components
-import HeroSection from './components/HeroSection';
 import VideoGrid from './components/VideoGrid';
-import SpeakerVideos from './components/SpeakerVideos';
 import { useAuth } from './hooks/useAuth';
 
 import './App.css';
 
 // --- Page Components defined outside the main App function ---
-// This avoids re-mounting on every render and solves potential runtime issues,
-// while also resolving the "Module not found" error by not needing a separate /pages directory.
-
-const HomePage = () => (
-  <>
-    <HeroSection />
-    <VideoGrid />
-  </>
-);
-
-const LearnerDashboard = () => (
+const VideoGridPage = () => (
   <div style={{ padding: '20px', minHeight: '70vh' }}>
     <VideoGrid />
   </div>
 );
-
-const SpeakerDashboard = () => {
-  const navigate = useNavigate();
-  const { isSpeaker } = useAuth();
-
-  if (!isSpeaker) {
-    return <p>You must be a speaker to access this dashboard.</p>;
-  }
-
-  return (
-    <div style={{ padding: '20px', minHeight: '70vh' }}>
-      <h2>Speaker Dashboard</h2>
-      <button onClick={() => navigate('/speaker/upload')} style={{ marginBottom: 20 }}>
-        Upload Video
-      </button>
-      <SpeakerVideos />
-    </div>
-  );
-};
 
 function App() {
   return (
@@ -72,6 +44,7 @@ function App() {
         {/* Routes that require authentication are nested within ProtectedRoute */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<LearnerDashboard />} />
+          <Route path="/videos" element={<VideoGridPage />} />
           <Route path="/my-library" element={<MyLibrary />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/speaker" element={<SpeakerDashboard />} />

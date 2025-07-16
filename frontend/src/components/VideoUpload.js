@@ -40,7 +40,7 @@ function VideoUpload() {
         formData.append('title', title);
         formData.append('description', description);
         formData.append('category', category);
-        formData.append('video', videoFile);
+        formData.append('videoFile', videoFile);
 
         await axios.post(`${API_URL}/api/videos`, formData, {
           headers: {
@@ -53,7 +53,7 @@ function VideoUpload() {
           title,
           description,
           category,
-          video_url: videoUrl,
+          videoUrl: videoUrl,
         };
         await axios.post(`${API_URL}/api/videos`, payload, {
           headers: {

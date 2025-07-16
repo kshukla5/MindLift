@@ -21,6 +21,49 @@ const VideoController = {
     }
   },
 
+  async getSpeakerVideos(req, res) {
+    try {
+      const userId = req.user.userId || req.user.id;
+      const videos = await VideoModel.getVideosByUserId(userId);
+      const stats = await VideoModel.getSpeakerStats(userId);
+      const recentActivity = await VideoModel.getRecentActivity(userId);
+      res.json({ videos, stats, recentActivity });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch speaker videos' });
+    }
+  },
+
+  async getSpeakerStats(req, res) {
+    try {
+      const userId = req.user.userId || req.user.id;
+      const stats = await VideoModel.getSpeakerStats(userId);
+      res.json(stats);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch speaker stats' });
+    }
+  },
+
+  async getLearnerDashboard(req, res) {
+    try {
+      const [platformStats, popularCategories, recentVideos] = await Promise.all([
+        VideoModel.getLearnerStats(),
+        VideoModel.getPopularCategories(),
+        VideoModel.getRecentVideos()
+      ]);
+      
+      res.json({
+        platformStats,
+        popularCategories,
+        recentVideos
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch learner dashboard data' });
+    }
+  },
+
   async getById(req, res) {
     try {
       const video = await VideoModel.getVideoById(req.params.id);
@@ -41,7 +84,16 @@ const VideoController = {
       if (!title || !uploaded) {
         return res.status(400).json({ error: 'Title and video are required' });
       }
-      const video = await VideoModel.createVideo({ title, description, category, videoUrl: uploaded });
+      
+      // For now, we'll link videos directly to users instead of the speakers table
+      // This simplifies the process and avoids the need for speaker profile creation
+      const video = await VideoModel.createVideo({ 
+        title, 
+        description, 
+        category, 
+        videoUrl: uploaded, 
+        userId: req.user.userId || req.user.id 
+      });
       res.status(201).json(video);
     } catch (err) {
       console.error(err);

@@ -3,7 +3,7 @@ import VideoPlayer from "./VideoPlayer";
 import { useVideoGrid } from "../hooks/useVideoGrid";
 import "./VideoGrid.css";
 
-function VideoGrid() {
+function VideoGrid({ limit = null, showSearch = true }) {
   const {
     videosByCategory,
     bookmarkedIds,
@@ -22,18 +22,31 @@ function VideoGrid() {
     return <p style={{ color: "red" }}>{error}</p>;
   }
 
+  // If limit is specified, flatten all videos and take only the first 'limit' videos
+  const getVideosToShow = () => {
+    if (limit) {
+      const allVideos = Object.values(videosByCategory).flat();
+      return { 'Featured Videos': allVideos.slice(0, limit) };
+    }
+    return videosByCategory;
+  };
+
+  const videosToShow = getVideosToShow();
+
   return (
     <div>
-      <div className="video-search-bar">
-        <input
-          type="text"
-          placeholder="Search videos by title or category..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="video-search-input"
-        />
-      </div>
-      {Object.entries(videosByCategory).map(([category, videos]) => (
+      {showSearch && (
+        <div className="video-search-bar">
+          <input
+            type="text"
+            placeholder="Search videos by title or category..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="video-search-input"
+          />
+        </div>
+      )}
+      {Object.entries(videosToShow).map(([category, videos]) => (
         <div key={category}>
           <h3>{category}</h3>
           <div className="video-grid">

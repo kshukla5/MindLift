@@ -2,6 +2,10 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const url = require('url');
 const jwt = require('jsonwebtoken');
+
+// Load environment variables from .env file
+require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
+
 const app = require('./app');
 
 const PORT = process.env.PORT || 3001;

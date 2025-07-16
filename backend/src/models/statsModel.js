@@ -7,7 +7,9 @@ const StatsModel = {
   },
 
   async getSubscriptionStats() {
-    const result = await pool.query('SELECT status, COUNT(*) AS count FROM users GROUP BY status');
+    const result = await pool.query(
+      'SELECT CASE WHEN is_paid = true THEN \'paid\' ELSE \'free\' END as status, COUNT(*) AS count FROM users GROUP BY is_paid'
+    );
     return result.rows;
   },
 

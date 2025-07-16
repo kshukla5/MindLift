@@ -20,6 +20,9 @@ const upload = multer({ storage });
 
 router.get('/videos', VideoController.list);
 router.get('/videos/unapproved', authorizeRoles('admin'), VideoController.listUnapproved);
+router.get('/speaker/videos', authorizeRoles('speaker', 'admin'), VideoController.getSpeakerVideos);
+router.get('/speaker/stats', authorizeRoles('speaker', 'admin'), VideoController.getSpeakerStats);
+router.get('/learner/dashboard', authorizeRoles('subscriber', 'speaker', 'admin'), VideoController.getLearnerDashboard);
 router.get('/videos/:id', VideoController.getById);
 router.post('/videos', authorizeRoles('speaker', 'admin'), upload.single('videoFile'), VideoController.create);
 router.put('/videos/:id', VideoController.update);
