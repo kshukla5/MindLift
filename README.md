@@ -1,41 +1,156 @@
-# MindLift
-MindLift is your daily dose of motivation, mindset mastery, and personal growth. Unlock your full potential with empowering content designed to elevate your thinking and transform your life.
+# 🚀 MindLift - Professional Learning Platform
 
-## 🚀 Quick Start
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)](https://github.com/kshukla5/MindLift)
+[![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-Latest-green)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-blue)](https://postgresql.org/)
 
-```bash
-# Clone the repository
-git clone https://github.com/skywardcloud/MindLift.git
-cd MindLift
+A comprehensive full-stack learning platform with role-based dashboards, video management, and interactive features. Built with React, Node.js, and PostgreSQL.
 
-# Run the automated setup
-npm run setup
+## ✨ Features
 
-# Edit .env with your database credentials
-# Then set up the database:
-createdb mindlift
-psql -d mindlift -f backend/sql/schema.sql
+### 🎯 **Role-Based Dashboards**
+- **👑 Admin Dashboard**: User management, content moderation, platform analytics
+- **🎤 Speaker Dashboard**: Video upload, performance metrics, audience insights
+- **📱 Learner Dashboard**: Personal progress, bookmarks, content discovery
 
-# Start the application
-npm run dev
-```
+### 🎥 **Video Management System**
+- Video upload with categorization
+- Approval workflow for content moderation
+- Interactive video player with React Player
+- Category-based filtering and search
 
-Visit http://localhost:3000 to view the application.
+### 📖 **Bookmark System**
+- One-click bookmark functionality
+- Personal bookmark library
+- Category-based organization
+- Usage analytics and insights
 
-## 📋 Environment Setup
+### 🎨 **Professional UI/UX**
+- Modern, responsive design
+- Mobile-first approach
+- Interactive components
+- Accessibility features
 
-### Required Environment Variables
+## � Quick Start
 
-1. **Create your environment file:**
+### Prerequisites
+- Node.js (v14 or higher)
+- PostgreSQL database
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
    ```bash
-   cp .env.example .env
+   git clone https://github.com/kshukla5/MindLift.git
+   cd MindLift
    ```
 
-2. **Edit the `.env` file** with your actual values:
-   - Database credentials (PostgreSQL)
-   - JWT secret key
-   - Email server settings (for NodeMailer)
-   - Stripe keys (if you want to re-enable payments)
+2. **Install dependencies**
+   ```bash
+   npm run install-all
+   ```
+
+3. **Environment setup**
+   ```bash
+   # Create .env file in project root
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=mindlift
+   DB_USER=your_db_user
+   DB_PASS=your_db_password
+   JWT_SECRET=your-secret-key
+   ```
+
+4. **Database setup**
+   ```bash
+   # Create database and run schema
+   psql -U your_db_user -d mindlift -f backend/sql/schema.sql
+   
+   # Create admin user
+   cd backend && node create_admin.js
+   ```
+
+5. **Start the application**
+   ```bash
+   # Start both servers
+   npm run dev
+   
+   # Or start separately
+   npm run backend  # Port 3001
+   npm run frontend # Port 3000
+   ```
+
+## 🌐 Access Points
+
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:3001](http://localhost:3001)
+- **Health Check**: [http://localhost:3001/api/health](http://localhost:3001/api/health)
+
+## � Test Accounts
+
+| Role | Email | Password | Access Level |
+|------|-------|----------|--------------|
+| Admin | kunjalcan@gmail.com | 12345 | Full platform control |
+| Speaker | speaker@test.com | password123 | Video upload & analytics |
+| Learner | subscriber@example.com | 12345 | Content viewing & bookmarks |
+
+## 📊 API Endpoints
+
+### Authentication
+- `POST /api/signup` - User registration
+- `POST /api/login` - User authentication
+
+### Videos
+- `GET /api/videos` - List approved videos
+- `POST /api/videos` - Upload video (Speaker/Admin)
+- `GET /api/speaker/videos` - Speaker dashboard data
+- `PATCH /api/videos/:id/approval` - Approve/reject (Admin)
+
+### Bookmarks
+- `GET /api/bookmarks` - User bookmarks
+- `POST /api/bookmarks` - Add bookmark
+- `DELETE /api/bookmarks/:videoId` - Remove bookmark
+- `GET /api/bookmarks/dashboard` - Bookmark analytics
+
+### Dashboard Data
+- `GET /api/learner/dashboard` - Learner analytics
+- `GET /api/admin/stats` - Admin statistics
+
+## 🧪 Testing
+
+### Run Test Scripts
+```bash
+cd backend
+
+# Test all dashboard functionality
+node test_all_dashboards.js
+
+# Test authentication flow
+node test_login_flow.js
+
+# Test specific APIs
+node test_api.js
+node test_bookmark_api.js
+```
+
+## 🔐 Security Features
+
+- JWT-based authentication
+- Password hashing with bcrypt
+- Role-based access control
+- Input validation and sanitization
+- CORS configuration
+- SQL injection prevention
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Tablet and desktop optimization
+- Touch-friendly interfaces
+- Accessible navigation
+- Progressive web app features
 
 3. **Required environment variables:**
    - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - PostgreSQL database configuration
