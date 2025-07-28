@@ -4,7 +4,7 @@ const UserController = require('../controllers/userController');
 const authorizeRoles = require('../middleware/authMiddleware');
 
 // Learner dashboard route
-router.get('/learner/dashboard', authorizeRoles('user', 'speaker', 'admin'), UserController.getLearnerDashboard);
+router.get('/learner/dashboard', authorizeRoles('subscriber', 'speaker', 'admin'), UserController.getLearnerDashboard);
 
 // Only admins can list all users
 router.get('/users', authorizeRoles('admin'), UserController.list);
