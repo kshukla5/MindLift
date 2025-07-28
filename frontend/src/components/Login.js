@@ -15,7 +15,8 @@ function Login() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    try {
+      console.log("API_URL:", API_URL);
+      console.log("Full URL:", `${API_URL}/api/login`);    try {
       const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
