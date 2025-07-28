@@ -53,6 +53,26 @@ function VideoUpload({ onVideoUploaded }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Clear previous messages
+    setError('');
+    setSuccessMessage('');
+    
+    // Validate required fields first
+    if (!title.trim()) {
+      setError('Please enter a video title.');
+      return;
+    }
+    if (!description.trim()) {
+      setError('Please enter a video description.');
+      return;
+    }
+    if (!category.trim()) {
+      setError('Please enter a category.');
+      return;
+    }
+    
+    // Then validate upload method
     if (uploadType === 'file' && !videoFile) {
       setError('Please select a video file to upload.');
       return;
@@ -61,16 +81,24 @@ function VideoUpload({ onVideoUploaded }) {
       setError('Please enter a video URL.');
       return;
     }
-    setError('');
-    setSuccessMessage('');
+    
+    // Additional URL validation for URL uploads
+    if (uploadType === 'url') {
+      const urlPattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com)/i;
+      if (!urlPattern.test(videoUrl.trim())) {
+        setError('Please enter a valid video URL from YouTube, Vimeo, or Dailymotion.');
+        return;
+      }
+    }
+    
     setIsLoading(true);
 
     try {
       if (uploadType === 'file') {
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
-        formData.append('category', category);
+        formData.append('title', title.trim());
+        formData.append('description', description.trim());
+        formData.append('category', category.trim());
         formData.append('videoFile', videoFile);
 
         await axios.post(`${API_URL}/api/videos`, formData, {
@@ -81,9 +109,9 @@ function VideoUpload({ onVideoUploaded }) {
         });
       } else { // 'url'
         const payload = {
-          title,
-          description,
-          category,
+          title: title.trim(),
+          description: description.trim(),
+          category: category.trim(),
           videoUrl: videoUrl.trim(),
         };
         await axios.post(`${API_URL}/api/videos`, payload, {
@@ -100,13 +128,17 @@ function VideoUpload({ onVideoUploaded }) {
       setCategory('');
       setVideoFile(null);
       setVideoUrl('');
-      e.target.reset(); // to clear the file input
+      
+      // Reset file input manually
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = '';
       
       // Trigger callback to refresh dashboard
       if (onVideoUploaded) {
         onVideoUploaded();
       }
     } catch (err) {
+      console.error('Upload error:', err);
       setError(err.response?.data?.error || 'An error occurred during submission.');
     } finally {
       setIsLoading(false);
@@ -118,12 +150,28 @@ function VideoUpload({ onVideoUploaded }) {
       <div className="video-upload-wrapper">
         <div className="video-upload-container">
           <div className="upload-header">
-            <h2>🎥 Video Upload</h2>
-            <p>Speaker access required to upload content</p>
+            <div className="upload-icon">🔒</div>
+            <h1>Access Restricted</h1>
+            <p>Speaker authorization required to upload videos</p>
           </div>
-          <div className="auth-message">
-            <div className="auth-icon">🔒</div>
-            <p>You must be logged in as a speaker to upload videos.</p>
+          <div className="message-container error">
+            <div className="message-icon">⚠️</div>
+            <div className="message-content">
+              <strong>Access Denied</strong>
+              <p>You must be logged in as a speaker to upload videos to our platform.</p>
+            </div>
+          </div>
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <button 
+              onClick={() => window.location.href = '/login'} 
+              className="submit-button"
+              style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+            >
+              <span className="button-content">
+                <span className="button-icon">��</span>
+                Go to Login
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -133,8 +181,10 @@ function VideoUpload({ onVideoUploaded }) {
   return (
     <div className="video-upload-wrapper">
       <div className="video-upload-container">
+        {/* Header Section */}
         <div className="upload-header">
-          <h2>🎥 Upload Your Video</h2>
+          <div className="upload-icon">��</div>
+          <h1>Upload Your Video</h1>
           <p>Share your knowledge and inspire learners worldwide</p>
         </div>
 
@@ -169,152 +219,154 @@ function VideoUpload({ onVideoUploaded }) {
             </div>
 
             <div className="input-group">
-              <label htmlFor="category">Categories *</label>
+              <label htmlFor="category">Category *</label>
               <input 
                 id="category" 
                 type="text" 
                 value={category} 
                 onChange={(e) => setCategory(e.target.value)} 
                 required 
-                disabled={isLoading} 
-                placeholder="e.g., Leadership, Communication, Personal Development"
+                disabled={isLoading}
+                placeholder="e.g., Leadership, Communication, Technology"
               />
-              <span className="input-hint">💡 Separate multiple categories with commas</span>
+              <small>💡 Separate multiple categories with commas</small>
             </div>
           </div>
 
           {/* Upload Method Section */}
           <div className="form-section">
-            <h3>📤 Upload Method</h3>
+            <h3>📹 Upload Method</h3>
+            
             <div className="upload-type-selector">
-              <label className={`upload-option ${uploadType === 'file' ? 'active' : ''}`}>
+              <div className={`upload-option ${uploadType === 'file' ? 'selected' : ''}`}>
                 <input 
                   type="radio" 
+                  id="upload-file"
                   value="file" 
                   checked={uploadType === 'file'} 
-                  onChange={() => setUploadType('file')} 
+                  onChange={() => setUploadType('file')}
+                  className="radio-input"
                 />
-                <div className="option-content">
-                  <span className="option-icon">📁</span>
-                  <div>
+                <label htmlFor="upload-file" className="upload-option-label">
+                  <div className="option-icon">📁</div>
+                  <div className="option-content">
                     <strong>Upload File</strong>
-                    <p>Upload MP4 video from your device</p>
+                    <span>Upload MP4 video from your device</span>
                   </div>
-                </div>
-              </label>
+                </label>
+              </div>
               
-              <label className={`upload-option ${uploadType === 'url' ? 'active' : ''}`}>
+              <div className={`upload-option ${uploadType === 'url' ? 'selected' : ''}`}>
                 <input 
                   type="radio" 
+                  id="upload-url"
                   value="url" 
                   checked={uploadType === 'url'} 
-                  onChange={() => setUploadType('url')} 
+                  onChange={() => setUploadType('url')}
+                  className="radio-input"
                 />
-                <div className="option-content">
-                  <span className="option-icon">🔗</span>
-                  <div>
-                    <strong>Video URL</strong>
-                    <p>Link to YouTube or Vimeo video</p>
+                <label htmlFor="upload-url" className="upload-option-label">
+                  <div className="option-icon">🔗</div>
+                  <div className="option-content">
+                    <strong>Video Link</strong>
+                    <span>Use YouTube, Vimeo, or other video URL</span>
                   </div>
-                </div>
-              </label>
+                </label>
+              </div>
             </div>
 
             {uploadType === 'file' ? (
-              <div className="input-group">
-                <label>Video File *</label>
-                <div 
-                  className={`file-drop-zone ${dragActive ? 'drag-active' : ''} ${videoFile ? 'has-file' : ''}`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  {videoFile ? (
-                    <div className="file-selected">
-                      <span className="file-icon">🎬</span>
-                      <div className="file-info">
-                        <strong>{videoFile.name}</strong>
-                        <p>{(videoFile.size / (1024 * 1024)).toFixed(2)} MB</p>
-                      </div>
-                      <button 
-                        type="button" 
-                        className="remove-file"
-                        onClick={() => setVideoFile(null)}
-                      >
-                        ✕
-                      </button>
+              <div 
+                className={`file-upload-area ${dragActive ? 'drag-active' : ''}`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                <input 
+                  id="videoFile" 
+                  type="file" 
+                  onChange={handleFileChange} 
+                  accept="video/mp4,video/avi,video/mov,video/wmv" 
+                  disabled={isLoading}
+                  className="file-input"
+                />
+                <label htmlFor="videoFile" className="file-upload-label">
+                  <div className="file-upload-content">
+                    <div className="file-icon">📤</div>
+                    <div className="file-text">
+                      <strong>Click to select video file</strong>
+                      <span>or drag and drop your video file here</span>
+                      <span>Supported formats: MP4, AVI, MOV, WMV</span>
                     </div>
-                  ) : (
-                    <div className="drop-content">
-                      <span className="upload-icon">☁️</span>
-                      <p><strong>Drop your video here</strong> or click to browse</p>
-                      <p className="file-hint">Supports MP4 files up to 500MB</p>
-                    </div>
-                  )}
-                  <input 
-                    id="videoFile" 
-                    type="file" 
-                    onChange={handleFileChange} 
-                    accept="video/mp4,video/quicktime,video/x-msvideo" 
-                    required={uploadType === 'file'} 
-                    disabled={isLoading}
-                    hidden
-                  />
-                </div>
+                  </div>
+                </label>
+                {videoFile && (
+                  <div className="file-selected">
+                    <span className="file-name">✅ {videoFile.name}</span>
+                    <span className="file-size">({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="input-group">
-                <label htmlFor="videoUrl">Video URL *</label>
                 <input 
                   id="videoUrl" 
                   type="url" 
                   value={videoUrl} 
                   onChange={(e) => setVideoUrl(e.target.value)} 
-                  required={uploadType === 'url'} 
-                  disabled={isLoading} 
-                  placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..."
+                  disabled={isLoading}
+                  className="url-input"
+                  placeholder="https://www.youtube.com/watch?v=example or https://vimeo.com/example"
                 />
-                <span className="input-hint">🎯 Make sure the video is publicly accessible</span>
+                <small>💡 Supported platforms: YouTube, Vimeo, Dailymotion</small>
               </div>
             )}
           </div>
 
           {/* Status Messages */}
           {error && (
-            <div className="message error-message">
-              <span className="message-icon">⚠️</span>
-              {error}
+            <div className="message-container error">
+              <div className="message-icon">⚠️</div>
+              <div className="message-content">
+                <strong>Upload Failed</strong>
+                <p>{error}</p>
+              </div>
             </div>
           )}
           
           {successMessage && (
-            <div className="message success-message">
-              <span className="message-icon">✅</span>
-              {successMessage}
+            <div className="message-container success">
+              <div className="message-icon">🎉</div>
+              <div className="message-content">
+                <strong>Upload Successful!</strong>
+                <p>{successMessage}</p>
+              </div>
             </div>
           )}
 
           {/* Submit Button */}
-          <div className="form-actions">
-            <button 
-              type="submit" 
-              className="submit-btn"
-              disabled={isLoading || (uploadType === 'file' && !videoFile) || (uploadType === 'url' && !videoUrl.trim())}
-            >
-              {isLoading ? (
-                <>
-                  <span className="loading-spinner"></span>
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <span>🚀</span>
-                  Submit Video for Review
-                </>
-              )}
-            </button>
-          </div>
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="submit-button"
+          >
+            {isLoading ? (
+              <span className="button-content">
+                <span className="spinner"></span>
+                Processing Upload...
+              </span>
+            ) : (
+              <span className="button-content">
+                <span className="button-icon">🚀</span>
+                Submit Video for Review
+              </span>
+            )}
+          </button>
+          
+          <p className="submit-note">
+            📝 Your video will be reviewed by our team before being published to ensure quality standards.
+          </p>
         </form>
       </div>
     </div>
