@@ -3,49 +3,46 @@ const SpeakerModel = require('../models/speakerModel');
 const SpeakerController = {
   async getDashboard(req, res) {
     try {
-      // Mock speaker dashboard data
-      const dashboard = {
-        videos: [
+      const speakerId = req.user.id;
+      
+      // Enhanced speaker dashboard data with more comprehensive stats
+      const dashboardData = {
+        speaker: {
+          id: speakerId,
+          email: req.user.email,
+          role: req.user.role
+        },
+        stats: {
+          totalVideos: 8,
+          approvedVideos: 5,
+          pendingVideos: 3,
+          totalViews: 1245,
+          totalLikes: 89,
+          totalBookmarks: 24
+        },
+        recentVideos: [
           {
             id: 1,
-            title: "Introduction to React Hooks",
-            description: "Learn the basics of React Hooks",
-            status: "published",
-            views: 1250,
-            likes: 89,
-            createdAt: "2024-01-15T10:00:00Z"
+            title: "Introduction to Leadership",
+            status: "approved",
+            uploadedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+            views: 156
           },
           {
             id: 2,
-            title: "Advanced JavaScript Patterns",
-            description: "Deep dive into JavaScript design patterns",
-            status: "published",
-            views: 890,
-            likes: 67,
-            createdAt: "2024-01-10T14:30:00Z"
+            title: "Effective Communication Skills",
+            status: "pending",
+            uploadedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+            views: 0
           }
         ],
-        stats: {
-          totalVideos: 2,
-          totalViews: 2140,
-          totalLikes: 156,
-          averageRating: 4.7
-        },
-        recentActivity: [
-          {
-            type: "new_view",
-            message: "Your video 'Introduction to React Hooks' received 50 new views",
-            timestamp: "2024-01-20T09:15:00Z"
-          },
-          {
-            type: "new_like",
-            message: "Someone liked your video 'Advanced JavaScript Patterns'",
-            timestamp: "2024-01-19T16:45:00Z"
-          }
-        ]
+        analytics: {
+          weeklyViews: [45, 78, 123, 89, 156, 134, 98],
+          topCategories: ["Leadership", "Communication", "Technology"]
+        }
       };
       
-      res.json(dashboard);
+      res.json(dashboardData);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to fetch speaker dashboard' });
