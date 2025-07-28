@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 
 // Import route modules
@@ -18,7 +19,7 @@ const corsOptions = {
         'https://mindlift-frontend.vercel.app'
     ],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
@@ -26,6 +27,10 @@ app.use(cors(corsOptions));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Root route - API status
 app.get('/', (req, res) => {
@@ -36,7 +41,9 @@ app.get('/', (req, res) => {
         deployment: 'Railway Production',
         endpoints: {
             auth: '/api/login, /api/signup',
-            health: '/health'
+            health: '/health',
+            videos: '/api/videos',
+            dashboard: '/api/speaker/dashboard, /api/learner/dashboard, /api/admin/dashboard'
         },
         timestamp: new Date().toISOString()
     });
@@ -113,6 +120,39 @@ app.post('/api/signup', (req, res) => {
     });
 
     res.status(201).json({ token });
+});
+
+// Dashboard routes with authentication middleware
+const authMiddleware = require('./middleware/authMiddleware');
+
+app.get('/api/speaker/dashboard', authMiddleware(['speaker', 'admin']), async (req, res) => {
+  try {
+    const VideoController = require('./controllers/videoController');
+    await VideoController.getSpeakerVideos(req, res);
+  } catch (error) {
+    console.error('Speaker dashboard error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/learner/dashboard', authMiddleware(['user', 'subscriber', 'speaker', 'admin']), async (req, res) => {
+  try {
+    const VideoController = require('./controllers/videoController');
+    await VideoController.getLearnerDashboard(req, res);
+  } catch (error) {
+    console.error('Learner dashboard error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/dashboard', authMiddleware(['admin']), async (req, res) => {
+  try {
+    const AdminController = require('./controllers/adminController');
+    await AdminController.getDashboard(req, res);
+  } catch (error) {
+    console.error('Admin dashboard error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 // Mount API routes
