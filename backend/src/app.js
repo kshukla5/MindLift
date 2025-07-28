@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 
 // Import route modules
@@ -29,8 +30,17 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Create uploads directory if it doesn't exist (for Railway)
+const uploadsPath = path.join(__dirname, '../uploads');
+try {
+  if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+  }
+  // Serve uploaded files
+  app.use('/uploads', express.static(uploadsPath));
+} catch (error) {
+  console.warn('Could not create uploads directory:', error.message);
+}
 
 // Root route - API status
 app.get('/', (req, res) => {
