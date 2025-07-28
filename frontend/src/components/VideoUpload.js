@@ -57,7 +57,7 @@ function VideoUpload({ onVideoUploaded }) {
       setError('Please select a video file to upload.');
       return;
     }
-    if (uploadType === 'url' && !videoUrl) {
+    if (uploadType === 'url' && !videoUrl.trim()) {
       setError('Please enter a video URL.');
       return;
     }
@@ -300,7 +300,7 @@ function VideoUpload({ onVideoUploaded }) {
             <button 
               type="submit" 
               className="submit-btn"
-              disabled={isLoading || (uploadType === 'file' && !videoFile) || (uploadType === 'url' && !videoUrl)}
+              disabled={isLoading || (uploadType === 'file' && !videoFile) || (uploadType === 'url' && !videoUrl.trim())}
             >
               {isLoading ? (
                 <>

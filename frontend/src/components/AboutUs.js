@@ -11,7 +11,7 @@ function AboutUs() {
           <p>
             A premium platform where influential voices in leadership, 
             personal development, and motivation unite to inspire transformation. 
-            Brought to you by KANDOR, your trusted partner in digital innovation.
+            Brought to you by KANDOR Leadership Training Inc., your trusted partner in corporate training.
           </p>
           <a href="#mission" className="scroll-down">Learn More</a>
         </div>
@@ -27,16 +27,16 @@ function AboutUs() {
           <div className="founder-info">
             <h2>Meet Our Founder</h2>
             <h3>Rinkal Shukla</h3>
-            <p className="founder-title">Founder & CEO, KANDOR</p>
+            <p className="founder-title">Founder & CEO, KANDOR Leadership Training Inc.</p>
             <p>
-              With a vision to democratize learning and personal development, 
-              Rinkal Shukla founded KANDOR to create innovative digital solutions 
-              that connect knowledge seekers with world-class educators and speakers.
+              Rinkal Shukla is a qualified Chartered Financial Analyst (CFA Level 2) and an MBA graduate from Gujarat 
+              University. She has also earned the distinction of securing first rank in public speaking under the 
+              guidance of Dipti Shah Public Speaking.
             </p>
             <p>
-              Under her leadership, KANDOR has become a trusted name in digital 
-              transformation, helping businesses and individuals achieve their 
-              full potential through technology-driven solutions.
+              As one of the leading motivational speakers & corporate trainers in India, Rinkal Shukla guides 
+              organizations through precise implementation of planning & strategies. Together, we can achieve 
+              our dreams and transform the future.
             </p>
           </div>
         </div>
@@ -58,37 +58,32 @@ function AboutUs() {
 
       <section id="kandor-services" className="kandor-services">
         <h2>KANDOR Services</h2>
-        <p className="services-intro">Beyond MindLift, KANDOR offers comprehensive digital solutions:</p>
+        <p className="services-intro">Create a strong & motivated workforce with our ONLINE & OFFLINE training programs:</p>
         <div className="services-grid">
           <div className="service-card">
-            <div className="service-icon">🌐</div>
-            <h3>Web Development</h3>
-            <p>Custom websites and web applications built with cutting-edge technology</p>
+            <div className="service-icon">👑</div>
+            <h3>Leadership Development</h3>
+            <p>Define leadership competencies and empower the potential talent, to cultivate a generation of strong leaders within an organization.</p>
           </div>
           <div className="service-card">
-            <div className="service-icon">📱</div>
-            <h3>Mobile Apps</h3>
-            <p>Native and cross-platform mobile applications for iOS and Android</p>
+            <div className="service-icon">🌟</div>
+            <h3>Personal Development</h3>
+            <p>Transform the way you manage your personal development goals and control how others perceive you by cultivating behavioral habits.</p>
           </div>
           <div className="service-card">
-            <div className="service-icon">☁️</div>
-            <h3>Cloud Solutions</h3>
-            <p>Scalable cloud infrastructure and deployment solutions</p>
+            <div className="service-icon">📊</div>
+            <h3>Presentation Skills</h3>
+            <p>Effective presentation skills are essential for clear communication, whether in business, education, or any public setting. This vital skill provides tools, tips, and techniques for delivering impactful presentations with confidence.</p>
           </div>
           <div className="service-card">
-            <div className="service-icon">🎨</div>
-            <h3>UI/UX Design</h3>
-            <p>User-centered design solutions that deliver exceptional experiences</p>
+            <div className="service-icon">🎤</div>
+            <h3>Public Speaking</h3>
+            <p>Revamp your personality with Communication, Presentation and Public Speaking techniques which boosts confidence and impression.</p>
           </div>
           <div className="service-card">
-            <div className="service-icon">🔧</div>
-            <h3>Digital Transformation</h3>
-            <p>Complete digital transformation strategies for modern businesses</p>
-          </div>
-          <div className="service-card">
-            <div className="service-icon">��</div>
-            <h3>Analytics & Insights</h3>
-            <p>Data-driven solutions to help you make informed business decisions</p>
+            <div className="service-icon">🤝</div>
+            <h3>Team Building</h3>
+            <p>Boost coherence & cooperation within your team to create a positive work place, improve productivity and achieve objectives.</p>
           </div>
         </div>
       </section>
@@ -121,16 +116,16 @@ function AboutUs() {
         <h2>What Our Clients Say</h2>
         <div className="testimonials-grid">
           <div className="testimonial">
-            <p>"KANDOR transformed our digital presence completely. Their expertise in web development and user experience is unmatched."</p>
-            <cite>— Sarah Johnson, Tech Startup CEO</cite>
+            <p>"We are immensely thankful to KANDOR Institute for imparting some valuable skills during our training program. The workshop on public speaking & Time management was received very well by the participants and the trainer Ms. Rinkal Shukla was able to communicate her message across to the participants successfully."</p>
+            <cite>— Jeet Parekh</cite>
           </div>
           <div className="testimonial">
-            <p>"Working with Rinkal and the KANDOR team was a game-changer for our business. They delivered beyond expectations."</p>
-            <cite>— Michael Chen, E-commerce Director</cite>
+            <p>"With great energy and knowledge about the training industry, Ms Rinkal shukla has changed the overall thought process of our employees. We have gone through 12 sessions and i must say it has changed the way we think and our approach towards other things."</p>
+            <cite>— Kunjal Shukla & Karan Bhatt</cite>
           </div>
           <div className="testimonial">
-            <p>"The MindLift platform has helped me reach thousands of learners worldwide. The technology is seamless and powerful."</p>
-            <cite>— Dr. Amanda Rodriguez, Motivational Speaker</cite>
+            <p>"The sessions were a perfect mixture of theoretical and practical knowledge imparting towards increasing confidence and motivation in our employees. We thank Ms Rinkal Shukla for this wonderful experience."</p>
+            <cite>— Corporate Training Participant</cite>
           </div>
         </div>
       </section>
@@ -138,14 +133,14 @@ function AboutUs() {
       <section id="story" className="story">
         <h2>Our Story</h2>
         <p>
-          Founded by passionate believers in the power of public speaking and digital innovation,
+          Founded by passionate believers in the power of public speaking and leadership development,
           MindLift was born from the realization that authentic stories have the
           power to change lives.
         </p>
         <p>
-          Backed by KANDOR's expertise in digital transformation, we created more than 
+          Backed by KANDOR's expertise in corporate training and personal development, we created more than 
           just a video library — a community, a movement, a shift in the way people 
-          learn, grow, and lead in the digital age.
+          learn, grow, and lead in their personal and professional lives.
         </p>
       </section>
 
@@ -159,7 +154,7 @@ function AboutUs() {
             🎧 Start Your Journey
           </Link>
           <Link to="/contact" className="btn btn-secondary">
-            💼 Partner with KANDOR
+            💼 Corporate Training
           </Link>
         </div>
       </section>
