@@ -9,18 +9,22 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+    
+    try {
       console.log("API_URL:", API_URL);
-      console.log("Full URL:", `${API_URL}/api/login`);    try {
+      console.log("Full URL:", `${API_URL}/api/login`);
+      
       const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
       if (!res.ok) {
@@ -57,32 +61,139 @@ function Login() {
     }
   };
 
+  const handleDemoLogin = async (role) => {
+    const demoAccounts = {
+      learner: { email: 'demo@learner.com', password: 'demo123' },
+      speaker: { email: 'demo@speaker.com', password: 'demo123' },
+      admin: { email: 'demo@admin.com', password: 'demo123' }
+    };
+    
+    const account = demoAccounts[role];
+    setEmail(account.email);
+    setPassword(account.password);
+    
+    // Auto-submit after a brief delay
+    setTimeout(() => {
+      document.querySelector('.auth-form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }, 100);
+  };
+
   return (
-    <div className="auth-container">
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Login to MindLift</h2>
-        {error && <p className="error-message">{error}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login'}
-        </button>
-        <p>
-          Don't have an account? <Link to="/signup">Sign up here</Link>
-        </p>
-      </form>
+    <div className="auth-wrapper">
+      <div className="auth-container">
+        <div className="auth-header">
+          <h1>Welcome Back!</h1>
+          <p>Sign in to continue your learning journey with MindLift</p>
+        </div>
+
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <h2>🔐 Login to Your Account</h2>
+          
+          {error && (
+            <div className="error-message">
+              <span className="error-icon">⚠️</span>
+              {error}
+            </div>
+          )}
+
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
+            <div className="input-container">
+              <span className="input-icon">📧</span>
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <div className="input-container">
+              <span className="input-icon">🔒</span>
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isLoading}
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" className="submit-btn" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <span className="loading-spinner"></span>
+                Signing In...
+              </>
+            ) : (
+              <>
+                <span>🚀</span>
+                Sign In
+              </>
+            )}
+          </button>
+
+          <div className="form-divider">
+            <span>or try a demo account</span>
+          </div>
+
+          <div className="demo-accounts">
+            <button
+              type="button"
+              className="demo-btn learner"
+              onClick={() => handleDemoLogin('learner')}
+              disabled={isLoading}
+            >
+              <span>🎧</span>
+              Demo Learner
+            </button>
+            <button
+              type="button"
+              className="demo-btn speaker"
+              onClick={() => handleDemoLogin('speaker')}
+              disabled={isLoading}
+            >
+              <span>🎤</span>
+              Demo Speaker
+            </button>
+            <button
+              type="button"
+              className="demo-btn admin"
+              onClick={() => handleDemoLogin('admin')}
+              disabled={isLoading}
+            >
+              <span>👑</span>
+              Demo Admin
+            </button>
+          </div>
+
+          <div className="auth-links">
+            <p>
+              Don't have an account? <Link to="/signup">Create Account</Link>
+            </p>
+            <p>
+              <Link to="/forgot-password">Forgot your password?</Link>
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
