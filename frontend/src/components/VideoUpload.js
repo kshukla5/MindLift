@@ -10,7 +10,7 @@ function VideoUpload({ onVideoUploaded }) {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [videoFile, setVideoFile] = useState(null);
-  const [uploadType, setUploadType] = useState('file'); // 'file' or 'url'
+  const [uploadType, setUploadType] = useState('file');
   const [videoUrl, setVideoUrl] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -107,7 +107,7 @@ function VideoUpload({ onVideoUploaded }) {
             Authorization: `Bearer ${token}`,
           },
         });
-      } else { // 'url'
+      } else {
         const payload = {
           title: title.trim(),
           description: description.trim(),
@@ -121,7 +121,9 @@ function VideoUpload({ onVideoUploaded }) {
           },
         });
       }
+      
       setSuccessMessage('Video submitted successfully! It will be reviewed by an admin.');
+      
       // Reset form
       setTitle('');
       setDescription('');
@@ -150,27 +152,19 @@ function VideoUpload({ onVideoUploaded }) {
       <div className="video-upload-wrapper">
         <div className="video-upload-container">
           <div className="upload-header">
-            <div className="upload-icon">🔒</div>
-            <h1>Access Restricted</h1>
+            <h2>Access Restricted</h2>
             <p>Speaker authorization required to upload videos</p>
           </div>
           <div className="message-container error">
-            <div className="message-icon">⚠️</div>
-            <div className="message-content">
-              <strong>Access Denied</strong>
-              <p>You must be logged in as a speaker to upload videos to our platform.</p>
-            </div>
+            <strong>Access Denied</strong>
+            <p>You must be logged in as a speaker to upload videos to our platform.</p>
           </div>
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
             <button 
               onClick={() => window.location.href = '/login'} 
               className="submit-button"
-              style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
             >
-              <span className="button-content">
-                <span className="button-icon">��</span>
-                Go to Login
-              </span>
+              Go to Login
             </button>
           </div>
         </div>
@@ -181,17 +175,15 @@ function VideoUpload({ onVideoUploaded }) {
   return (
     <div className="video-upload-wrapper">
       <div className="video-upload-container">
-        {/* Header Section */}
         <div className="upload-header">
-          <div className="upload-icon">��</div>
-          <h1>Upload Your Video</h1>
+          <h2>Upload Your Video</h2>
           <p>Share your knowledge and inspire learners worldwide</p>
         </div>
 
         <form onSubmit={handleSubmit} className="upload-form">
-          {/* Video Details Section */}
           <div className="form-section">
-            <h3>📝 Video Details</h3>
+            <h3>Video Details</h3>
+            
             <div className="input-group">
               <label htmlFor="title">Video Title *</label>
               <input 
@@ -229,13 +221,12 @@ function VideoUpload({ onVideoUploaded }) {
                 disabled={isLoading}
                 placeholder="e.g., Leadership, Communication, Technology"
               />
-              <small>💡 Separate multiple categories with commas</small>
+              <small>Separate multiple categories with commas</small>
             </div>
           </div>
 
-          {/* Upload Method Section */}
           <div className="form-section">
-            <h3>📹 Upload Method</h3>
+            <h3>Upload Method</h3>
             
             <div className="upload-type-selector">
               <div className={`upload-option ${uploadType === 'file' ? 'selected' : ''}`}>
@@ -248,7 +239,6 @@ function VideoUpload({ onVideoUploaded }) {
                   className="radio-input"
                 />
                 <label htmlFor="upload-file" className="upload-option-label">
-                  <div className="option-icon">📁</div>
                   <div className="option-content">
                     <strong>Upload File</strong>
                     <span>Upload MP4 video from your device</span>
@@ -266,7 +256,6 @@ function VideoUpload({ onVideoUploaded }) {
                   className="radio-input"
                 />
                 <label htmlFor="upload-url" className="upload-option-label">
-                  <div className="option-icon">🔗</div>
                   <div className="option-content">
                     <strong>Video Link</strong>
                     <span>Use YouTube, Vimeo, or other video URL</span>
@@ -293,7 +282,6 @@ function VideoUpload({ onVideoUploaded }) {
                 />
                 <label htmlFor="videoFile" className="file-upload-label">
                   <div className="file-upload-content">
-                    <div className="file-icon">📤</div>
                     <div className="file-text">
                       <strong>Click to select video file</strong>
                       <span>or drag and drop your video file here</span>
@@ -303,13 +291,14 @@ function VideoUpload({ onVideoUploaded }) {
                 </label>
                 {videoFile && (
                   <div className="file-selected">
-                    <span className="file-name">✅ {videoFile.name}</span>
+                    <span className="file-name">Selected: {videoFile.name}</span>
                     <span className="file-size">({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
                   </div>
                 )}
               </div>
             ) : (
               <div className="input-group">
+                <label htmlFor="videoUrl">Video URL *</label>
                 <input 
                   id="videoUrl" 
                   type="url" 
@@ -319,53 +308,35 @@ function VideoUpload({ onVideoUploaded }) {
                   className="url-input"
                   placeholder="https://www.youtube.com/watch?v=example or https://vimeo.com/example"
                 />
-                <small>💡 Supported platforms: YouTube, Vimeo, Dailymotion</small>
+                <small>Supported platforms: YouTube, Vimeo, Dailymotion</small>
               </div>
             )}
           </div>
 
-          {/* Status Messages */}
           {error && (
             <div className="message-container error">
-              <div className="message-icon">⚠️</div>
-              <div className="message-content">
-                <strong>Upload Failed</strong>
-                <p>{error}</p>
-              </div>
+              <strong>Upload Failed</strong>
+              <p>{error}</p>
             </div>
           )}
           
           {successMessage && (
             <div className="message-container success">
-              <div className="message-icon">🎉</div>
-              <div className="message-content">
-                <strong>Upload Successful!</strong>
-                <p>{successMessage}</p>
-              </div>
+              <strong>Upload Successful!</strong>
+              <p>{successMessage}</p>
             </div>
           )}
 
-          {/* Submit Button */}
           <button 
             type="submit" 
             disabled={isLoading}
             className="submit-button"
           >
-            {isLoading ? (
-              <span className="button-content">
-                <span className="spinner"></span>
-                Processing Upload...
-              </span>
-            ) : (
-              <span className="button-content">
-                <span className="button-icon">🚀</span>
-                Submit Video for Review
-              </span>
-            )}
+            {isLoading ? 'Processing Upload...' : 'Submit Video for Review'}
           </button>
           
           <p className="submit-note">
-            📝 Your video will be reviewed by our team before being published to ensure quality standards.
+            Your video will be reviewed by our team before being published to ensure quality standards.
           </p>
         </form>
       </div>
