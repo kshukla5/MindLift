@@ -132,11 +132,12 @@ app.post('/api/signup', (req, res) => {
     res.status(201).json({ token });
 });
 
-// Dashboard routes with authentication middleware
+// Dashboard routes with authentication middleware  
 const authMiddleware = require('./middleware/authMiddleware');
 
 app.get('/api/speaker/dashboard', authMiddleware(['speaker', 'admin']), async (req, res) => {
   try {
+    console.log('Speaker dashboard accessed by:', req.user);
     const VideoController = require('./controllers/videoController');
     await VideoController.getSpeakerVideos(req, res);
   } catch (error) {
@@ -145,8 +146,10 @@ app.get('/api/speaker/dashboard', authMiddleware(['speaker', 'admin']), async (r
   }
 });
 
+// Debug logging for authentication
 app.get('/api/learner/dashboard', authMiddleware(['user', 'subscriber', 'speaker', 'admin']), async (req, res) => {
   try {
+    console.log('Learner dashboard accessed by:', req.user);
     const VideoController = require('./controllers/videoController');
     await VideoController.getLearnerDashboard(req, res);
   } catch (error) {
