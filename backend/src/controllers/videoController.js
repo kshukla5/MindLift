@@ -4,27 +4,31 @@ const path = require('path');
 class VideoController {
   async list(req, res) {
     try {
-      const { category, limit = 10, offset = 0 } = req.query;
-      
-      // If there's no database, return mock data
-      const videos = await VideoModel.findAll({
-        category,
-        approved: true,
-        limit: parseInt(limit),
-        offset: parseInt(offset)
-      }).catch(() => [
+      // For now, return mock data until database is properly configured
+      const videos = [
         {
           id: 1,
-          title: "Sample Video - Introduction to React",
-          description: "Learn the basics of React development",
+          title: "Introduction to React Hooks",
+          description: "Learn the fundamentals of React Hooks and how to use them effectively",
           category: "Technology",
-          url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          url: "https://www.youtube.com/watch?v=O6P86uwfdR0",
           file_path: null,
           approved: true,
           created_at: new Date().toISOString(),
           speaker_id: 1
+        },
+        {
+          id: 2,
+          title: "JavaScript ES6 Features",
+          description: "Explore modern JavaScript features and syntax",
+          category: "Technology", 
+          url: "https://www.youtube.com/watch?v=hKB-YGF14SY",
+          file_path: null,
+          approved: true,
+          created_at: new Date().toISOString(),
+          speaker_id: 2
         }
-      ]);
+      ];
       
       res.json({ success: true, videos });
     } catch (error) {
@@ -155,25 +159,27 @@ class VideoController {
 
   async getSpeakerVideos(req, res) {
     try {
-      const userId = req.user.id;
-      const videos = await VideoModel.findBySpeakerId(userId).catch(() => []);
-      const stats = await VideoModel.getSpeakerStats(userId).catch(() => ({
-        totalVideos: 0,
-        approvedVideos: 0,
-        pendingVideos: 0,
-        totalViews: 0
-      }));
-      
-      res.json({ 
-        success: true, 
-        videos,
-        stats: {
-          totalVideos: stats.total_videos || 0,
-          approvedVideos: stats.approved_videos || 0,
-          pendingVideos: stats.pending_videos || 0,
-          totalViews: stats.total_views || 0
+      // Mock speaker videos for testing
+      const videos = [
+        {
+          id: 1,
+          title: "My First Video",
+          description: "Getting started with video creation",
+          category: "Tutorial",
+          url: "https://www.youtube.com/watch?v=example1",
+          approved: true,
+          created_at: new Date().toISOString()
         }
-      });
+      ];
+      
+      const stats = {
+        totalVideos: 5,
+        approvedVideos: 4,
+        pendingVideos: 1,
+        totalViews: 120
+      };
+      
+      res.json({ success: true, videos, stats });
     } catch (error) {
       console.error('Error getting speaker videos:', error);
       res.status(500).json({ success: false, error: error.message });
@@ -202,42 +208,37 @@ class VideoController {
 
   async getLearnerDashboard(req, res) {
     try {
-      const userId = req.user.id;
-      
-      // Get recent videos with fallback
-      const recentVideos = await VideoModel.findAll({ 
-        approved: true, 
-        limit: 6, 
-        offset: 0 
-      }).catch(() => [
+      // Mock learner dashboard for testing
+      const recentVideos = [
         {
           id: 1,
-          title: "Welcome to MindLift",
-          description: "Getting started with our learning platform",
-          category: "Introduction",
-          url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          title: "Introduction to React Hooks",
+          description: "Learn React Hooks fundamentals",
+          category: "Technology",
+          url: "https://www.youtube.com/watch?v=O6P86uwfdR0",
+          approved: true,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          title: "JavaScript ES6 Features", 
+          description: "Modern JavaScript syntax and features",
+          category: "Technology",
+          url: "https://www.youtube.com/watch?v=hKB-YGF14SY",
           approved: true,
           created_at: new Date().toISOString()
         }
-      ]);
+      ];
       
-      // Get user's bookmarked videos with fallback
-      let bookmarks = [];
-      try {
-        const BookmarkModel = require('../models/bookmarkModel');
-        bookmarks = await BookmarkModel.findByUserId(userId);
-      } catch (error) {
-        console.warn('Bookmarks not available:', error.message);
-        bookmarks = [];
-      }
+      const bookmarkedVideos = [];
       
       res.json({ 
         success: true, 
         recentVideos,
-        bookmarkedVideos: bookmarks || [],
+        bookmarkedVideos,
         stats: {
           totalVideos: recentVideos.length,
-          bookmarkedVideos: bookmarks ? bookmarks.length : 0
+          bookmarkedVideos: bookmarkedVideos.length
         }
       });
     } catch (error) {
