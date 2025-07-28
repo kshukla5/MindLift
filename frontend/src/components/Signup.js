@@ -3,12 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import './AuthForm.css';
 import { connectSocket } from '../services/socket';
 import API_URL from '../api';
+
 function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState('learner');
+  const [role, setRole] = useState('subscriber');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ function Signup() {
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
-        <h2>Create an Account</h2>
+        <h2>Sign Up</h2>
         <form onSubmit={handleSubmit}>
           <label htmlFor="name">Name</label>
           <input
@@ -107,7 +108,7 @@ function Signup() {
             required
             disabled={isLoading}
           >
-            <option value="learner">Learner</option>
+            <option value="subscriber">Learner</option>
             <option value="speaker">Speaker</option>
           </select>
           {error && <p className="error-text">{error}</p>}
