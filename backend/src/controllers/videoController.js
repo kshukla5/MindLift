@@ -65,8 +65,12 @@ const VideoController = {
         videoUrl = `/uploads/${req.file.filename}`;
       }
 
-      if (!title || !description || !videoUrl) {
-        return res.status(400).json({ error: 'Title, description and video (file or URL) are required' });
+      if (!title || !description) {
+        return res.status(400).json({ error: 'Title and description are required' });
+      }
+
+      if (!videoUrl) {
+        return res.status(400).json({ error: 'Please provide either a video file or video URL' });
       }
 
       try {
