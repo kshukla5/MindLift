@@ -58,11 +58,19 @@ const VideoController = {
       const { title, description, url, category } = req.body;
       const speakerId = req.user.id;
 
+      // Debug logging
+      console.log('Request body:', req.body);
+      console.log('Request file:', req.file);
+      console.log('URL from body:', url);
+
       // Handle both file upload and URL cases
       let videoUrl = url;
       if (req.file) {
         // File was uploaded
         videoUrl = `/uploads/${req.file.filename}`;
+        console.log('File upload detected, videoUrl set to:', videoUrl);
+      } else {
+        console.log('No file detected, using URL from body:', videoUrl);
       }
 
       if (!title || !description) {
@@ -70,6 +78,7 @@ const VideoController = {
       }
 
       if (!videoUrl) {
+        console.log('No videoUrl found - title:', title, 'description:', description, 'url:', url, 'file:', !!req.file);
         return res.status(400).json({ error: 'Please provide either a video file or video URL' });
       }
 
