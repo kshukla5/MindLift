@@ -22,7 +22,7 @@ function Signup() {
     }
     setIsLoading(true);
     try {
-      const res = await fetch('/api/signup', {
+      const res = await fetch(`${API_URL}/api/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role }),
