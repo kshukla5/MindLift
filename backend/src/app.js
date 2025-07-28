@@ -1,6 +1,21 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const app = express();
+
+// CORS configuration
+const corsOptions = {
+    origin: [
+        'http://localhost:3000',
+        'https://mind-lift-sooty.vercel.app',
+        'https://mindlift-frontend.vercel.app'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());

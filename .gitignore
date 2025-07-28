@@ -64,3 +64,4 @@ temp/
 # Package locks (uncomment if using yarn)
 # package-lock.json
 # yarn.lock
+.vercel
