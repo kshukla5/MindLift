@@ -140,3 +140,24 @@ const VideoController = {
 };
 
 module.exports = VideoController;
+
+  async updateApproval(req, res) {
+    try {
+      const { approved } = req.body;
+      // Mock response for video approval
+      const video = {
+        id: req.params.id,
+        approved: approved,
+        updated_at: new Date().toISOString()
+      };
+      
+      res.json({ 
+        success: true,
+        video: video,
+        message: `Video ${approved ? 'approved' : 'rejected'} successfully`
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to update approval status' });
+    }
+  },
