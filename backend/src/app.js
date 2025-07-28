@@ -3,6 +3,13 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const app = express();
 
+// Import route modules
+const adminRoutes = require('./routes/adminRoutes');
+const speakerRoutes = require('./routes/speakerRoutes');
+const bookmarkRoutes = require('./routes/bookmarkRoutes');
+const videoRoutes = require('./routes/videoRoutes');
+const userRoutes = require('./routes/userRoutes');
+
 // CORS configuration
 const corsOptions = {
     origin: [
@@ -106,5 +113,12 @@ app.post('/api/signup', (req, res) => {
 
     res.status(201).json({ token });
 });
+
+// Mount API routes
+app.use('/api', adminRoutes);
+app.use('/api', speakerRoutes);
+app.use('/api', bookmarkRoutes);
+app.use('/api', videoRoutes);
+app.use('/api', userRoutes);
 
 module.exports = app;

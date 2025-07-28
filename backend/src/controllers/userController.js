@@ -5,6 +5,49 @@ const UserModel = require('../models/userModel');
 const allowedRoles = ['speaker', 'subscriber', 'admin'];
 
 const UserController = {
+  async getLearnerDashboard(req, res) {
+    try {
+      // Mock learner dashboard data
+      const dashboard = {
+        platformStats: {
+          totalVideos: 150,
+          totalSpeakers: 25,
+          totalHours: 320,
+          activeUsers: 1200
+        },
+        popularCategories: [
+          { name: "JavaScript", count: 45, color: "#F7DF1E" },
+          { name: "React", count: 32, color: "#61DAFB" },
+          { name: "Python", count: 28, color: "#3776AB" },
+          { name: "Node.js", count: 24, color: "#339933" }
+        ],
+        recentVideos: [
+          {
+            id: 1,
+            title: "Advanced React Patterns",
+            speaker: "John Doe",
+            duration: "45 min",
+            category: "React",
+            thumbnail: "/api/placeholder/300/200"
+          },
+          {
+            id: 2,
+            title: "Python Data Science",
+            speaker: "Jane Smith",
+            duration: "60 min", 
+            category: "Python",
+            thumbnail: "/api/placeholder/300/200"
+          }
+        ]
+      };
+      
+      res.json(dashboard);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch learner dashboard' });
+    }
+  },
+
   async list(req, res) {
     try {
       const users = await UserModel.getAllUsers();

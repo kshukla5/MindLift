@@ -3,6 +3,9 @@ const router = express.Router();
 const SpeakerController = require('../controllers/speakerController');
 const authorizeRoles = require('../middleware/authMiddleware');
 
+// Speaker dashboard route
+router.get('/speaker/videos', authorizeRoles('speaker', 'admin'), SpeakerController.getDashboard);
+
 router.get('/speakers', SpeakerController.list);
 router.get('/speakers/:id', SpeakerController.getById);
 router.post('/speakers', authorizeRoles('admin'), SpeakerController.create);
