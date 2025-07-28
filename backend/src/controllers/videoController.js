@@ -58,15 +58,22 @@ const VideoController = {
       const { title, description, url, category } = req.body;
       const speakerId = req.user.id;
 
-      if (!title || !description || !url) {
-        return res.status(400).json({ error: 'Title, description and URL are required' });
+      // Handle both file upload and URL cases
+      let videoUrl = url;
+      if (req.file) {
+        // File was uploaded
+        videoUrl = `/uploads/${req.file.filename}`;
+      }
+
+      if (!title || !description || !videoUrl) {
+        return res.status(400).json({ error: 'Title, description and video (file or URL) are required' });
       }
 
       try {
         const video = await VideoModel.createVideo({ 
           title, 
           description, 
-          url, 
+          url: videoUrl, 
           category, 
           speaker_id: speakerId 
         });
@@ -79,7 +86,7 @@ const VideoController = {
           id: Math.floor(Math.random() * 1000) + 100,
           title,
           description,
-          url,
+          url: videoUrl,
           category,
           speaker_id: speakerId,
           approved: false,
