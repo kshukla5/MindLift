@@ -49,32 +49,39 @@ function Login() {
         navigate('/dashboard');
       }
       window.location.reload(); // To ensure all components re-render with new auth state
-
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
-        <h2>Log In</h2>
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="email">Email</label>
-          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} />
-          <label htmlFor="password">Password</label>
-          <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} />
-          {error && <p className="error-text">{error}</p>}
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? 'Logging In...' : 'Log In'}
-          </button>
-        </form>
-        <p className="footer-text">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
+    <div className="auth-container">
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <h2>Login to MindLift</h2>
+        {error && <p className="error-message">{error}</p>}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
+        <p>
+          Don't have an account? <Link to="/signup">Sign up here</Link>
         </p>
-      </div>
+      </form>
     </div>
   );
 }
