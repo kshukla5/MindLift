@@ -58,7 +58,7 @@ function VideoUpload({ onVideoUploaded }) {
     setError('');
     setSuccessMessage('');
     
-    // Validate required fields first
+    // Validate required fields
     if (!title.trim()) {
       setError('Please enter a video title.');
       return;
@@ -72,18 +72,18 @@ function VideoUpload({ onVideoUploaded }) {
       return;
     }
     
-    // Then validate upload method
-    if (uploadType === 'file' && !videoFile) {
-      setError('Please select a video file to upload.');
-      return;
-    }
-    if (uploadType === 'url' && !videoUrl.trim()) {
-      setError('Please enter a video URL.');
-      return;
-    }
-    
-    // Additional URL validation for URL uploads
-    if (uploadType === 'url') {
+    // Validate based on upload method
+    if (uploadType === 'file') {
+      if (!videoFile) {
+        setError('Please select a video file to upload.');
+        return;
+      }
+    } else if (uploadType === 'url') {
+      if (!videoUrl.trim()) {
+        setError('Please enter a video URL.');
+        return;
+      }
+      // Basic URL validation for video URLs
       const urlPattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com)/i;
       if (!urlPattern.test(videoUrl.trim())) {
         setError('Please enter a valid video URL from YouTube, Vimeo, or Dailymotion.');
