@@ -56,7 +56,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-that-matches
 // This is a mock user database. In a real application, you would query a database.
 const users = [
     { id: 1, email: 'test@example.com', password: 'password123', role: 'user' },
-    { id: 2, email: 'admin@example.com', password: 'adminpassword', role: 'admin' }
+    { id: 2, email: 'admin@example.com', password: 'adminpassword', role: 'admin' },
+    { id: 3, email: 'speaker@example.com', password: 'speakerpass', role: 'speaker' }
 ];
 
 // Define the /api/login route
