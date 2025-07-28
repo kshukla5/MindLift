@@ -8,7 +8,7 @@ function authorizeRoles(...allowed) {
         return res.status(401).json({ error: 'Missing authorization token' });
       }
       const token = header.slice(7);
-      const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+      const payload = jwt.verify(token, process.env.JWT_SECRET || 'your-super-secret-key-that-matches-the-one-in-app.js');
       if (!allowed.includes(payload.role)) {
         return res.status(403).json({ error: 'Forbidden' });
       }
