@@ -71,14 +71,15 @@ function VideoUpload({ onVideoUploaded }) {
       setError('Please enter a category.');
       return;
     }
-    
-    // Validate based on upload method
+
+    // Only require the selected upload method
     if (uploadType === 'file') {
       if (!videoFile) {
         setError('Please select a video file to upload.');
         return;
       }
-    } else if (uploadType === 'url') {
+    }
+    if (uploadType === 'url') {
       if (!videoUrl.trim()) {
         setError('Please enter a video URL.');
         return;
