@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 
 const allowedRoles = ['speaker', 'subscriber', 'admin'];
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-that-matches-the-one-in-app.js';
 
 const UserController = {
   async list(req, res) {
@@ -33,14 +34,14 @@ const UserController = {
         const hashed = await bcrypt.hash(password, 10);
         const user = await UserModel.createUser({ name, email, password: hashed, role: userRole });
 
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
         res.status(201).json({ token });
       } catch (dbError) {
         console.error('Database error during signup:', dbError);
         
         // Fallback: create mock user for testing when DB is unavailable
         const mockUserId = Math.floor(Math.random() * 1000) + 100;
-        const token = jwt.sign({ id: mockUserId, email, role: userRole }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
+        const token = jwt.sign({ id: mockUserId, email, role: userRole }, JWT_SECRET, { expiresIn: '1h' });
         res.status(201).json({ token });
       }
     } catch (err) {
@@ -67,7 +68,7 @@ const UserController = {
           return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
         res.json({ token });
       } catch (dbError) {
         console.error('Database error during login:', dbError);
@@ -76,7 +77,7 @@ const UserController = {
         const mockRole = email.includes('speaker') ? 'speaker' : 
                         email.includes('admin') ? 'admin' : 'subscriber';
         const mockUserId = Math.floor(Math.random() * 1000) + 100;
-        const token = jwt.sign({ id: mockUserId, email, role: mockRole }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
+        const token = jwt.sign({ id: mockUserId, email, role: mockRole }, JWT_SECRET, { expiresIn: '1h' });
         res.json({ token });
       }
     } catch (err) {
