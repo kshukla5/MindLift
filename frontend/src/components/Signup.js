@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './AuthForm.css';
 import { connectSocket } from '../services/socket';
-
+import API_URL from '../api';
 function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
