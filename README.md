@@ -317,3 +317,4 @@ For support, email support@mindlift.com or create an issue on GitHub.
 
 Built with ❤️ by the MindLift Team
 
+# Force Vercel redeploy Mon Jul 28 02:51:58 EDT 2025
