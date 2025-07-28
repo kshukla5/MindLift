@@ -55,13 +55,17 @@ const VideoController = {
 
   async create(req, res) {
     try {
-      const { title, description, url, category } = req.body;
+      const { title, description, category } = req.body;
+      let { url } = req.body;
       const speakerId = req.user.id;
+
+      // Trim whitespace from URL
+      url = url ? url.trim() : '';
 
       // Debug logging
       console.log('Request body:', req.body);
       console.log('Request file:', req.file);
-      console.log('URL from body:', url);
+      console.log('URL from body (trimmed):', url);
 
       // Handle both file upload and URL cases
       let videoUrl = url;
@@ -79,7 +83,13 @@ const VideoController = {
 
       if (!videoUrl) {
         console.log('No videoUrl found - title:', title, 'description:', description, 'url:', url, 'file:', !!req.file);
-        return res.status(400).json({ error: 'Please provide either a video file or video URL' });
+        if (!req.file && !url) {
+          return res.status(400).json({ error: 'Please provide either a video file or a video URL' });
+        } else if (!req.file && url === '') {
+          return res.status(400).json({ error: 'Video URL cannot be empty' });
+        } else {
+          return res.status(400).json({ error: 'Please provide either a video file or video URL' });
+        }
       }
 
       try {
