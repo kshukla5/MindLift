@@ -58,6 +58,14 @@ function VideoUpload({ onVideoUploaded }) {
     setError('');
     setSuccessMessage('');
     
+    console.log('DEBUG: Form submitted');
+    console.log('DEBUG: uploadType:', uploadType);
+    console.log('DEBUG: title:', title);
+    console.log('DEBUG: description:', description);
+    console.log('DEBUG: category:', category);
+    console.log('DEBUG: videoUrl:', videoUrl);
+    console.log('DEBUG: videoFile:', videoFile);
+    
     // Validate required fields
     if (!title.trim()) {
       setError('Please enter a video title.');
@@ -80,16 +88,29 @@ function VideoUpload({ onVideoUploaded }) {
       }
     }
     if (uploadType === 'url') {
+      console.log('DEBUG: uploadType is url');
+      console.log('DEBUG: videoUrl value:', `"${videoUrl}"`);
+      console.log('DEBUG: videoUrl.trim() value:', `"${videoUrl.trim()}"`);
+      
       if (!videoUrl.trim()) {
+        console.log('DEBUG: URL is empty after trim');
         setError('Please enter a video URL.');
         return;
       }
+      
       // Basic URL validation for video URLs
       const urlPattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com)/i;
-      if (!urlPattern.test(videoUrl.trim())) {
+      const testResult = urlPattern.test(videoUrl.trim());
+      console.log('DEBUG: URL pattern test result:', testResult);
+      console.log('DEBUG: URL being tested:', videoUrl.trim());
+      
+      if (!testResult) {
+        console.log('DEBUG: URL failed pattern validation');
         setError('Please enter a valid video URL from YouTube, Vimeo, or Dailymotion.');
         return;
       }
+      
+      console.log('DEBUG: URL validation passed');
     }
     
     setIsLoading(true);
