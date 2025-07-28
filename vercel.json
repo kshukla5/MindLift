@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "name": "mindlift-frontend",
+  "builds": [
+    { "src": "frontend/package.json", "use": "@vercel/static-build", "config": { "distDir": "build" } }
+  ],
+  "routes": [
+    { "src": "/static/(.*)", "dest": "frontend/build/static/$1" },
+    { "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))", "dest": "frontend/build/$1" },
+    { "src": "/(.*)", "dest": "frontend/build/index.html" }
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://mindlift-backend-production.up.railway.app"
+  },
+  "build": {
+    "env": {
+      "REACT_APP_API_URL": "https://mindlift-backend-production.up.railway.app"
+    }
+  }
+}

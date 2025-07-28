@@ -108,6 +108,37 @@ const UserController = {
       res.status(500).json({ error: 'Failed to delete user' });
     }
   },
+
+  async getLearnerDashboard(req, res) {
+    try {
+      // Mock data for learner dashboard
+      const dashboardData = {
+        user: {
+          id: req.user.id,
+          email: req.user.email,
+          role: req.user.role
+        },
+        stats: {
+          videosWatched: 12,
+          bookmarks: 5,
+          completedCourses: 3
+        },
+        recentVideos: [
+          {
+            id: 1,
+            title: "Introduction to React Hooks",
+            category: "Technology",
+            watchedAt: new Date().toISOString()
+          }
+        ]
+      };
+      
+      res.json(dashboardData);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch learner dashboard' });
+    }
+  }
 };
 
 module.exports = UserController;
