@@ -29,53 +29,86 @@
 
 .hero-btns {
   margin-top: 32px;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .btn {
-  padding: 12px 26px;
-  border-radius: 4px;
-  font-size: 18px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
   border: none;
   outline: none;
   transition: all 0.3s ease-out;
-  margin: 0 5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  backdrop-filter: blur(10px);
+  text-transform: none;
+  letter-spacing: 0.5px;
 }
 
 .btn-primary {
-  background-color: #17a2b8; /* Primary button color */
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: #fff;
-  border: 1px solid #17a2b8;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .btn-primary:hover {
-  background-color: #138496;
-  border-color: #117a8b;
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a6fd8, #6a42a0);
 }
 
 .btn-outline {
-  background-color: transparent;
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  border: 1px solid #fff;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .btn-outline:hover {
-  background-color: #fff;
-  color: #282c34; /* Your background color */
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn-large {
-  padding: 16px 32px;
-  font-size: 20px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  min-width: 160px;
+  justify-content: center;
+}
+
+/* Remove the overly large styling for better UX */
+.btn:not(.btn-large) {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  min-width: 140px;
+  justify-content: center;
 }
 
 @media screen and (max-width: 960px) {
   .hero-container > h1 {
     font-size: 50px;
     margin-top: -150px;
+  }
+  
+  .hero-btns {
+    gap: 0.75rem;
+  }
+  
+  .btn-large {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+    min-width: 150px;
   }
 }
 
@@ -89,8 +122,65 @@
     font-size: 24px;
   }
 
-  .btn-large {
-    padding: 12px 26px;
-    font-size: 18px;
+  .hero-btns {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
   }
+
+  .btn-large {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .btn:not(.btn-large) {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 250px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .hero-container > h1 {
+    font-size: 32px;
+    margin-top: -80px;
+  }
+
+  .hero-container > p {
+    font-size: 20px;
+  }
+
+  .btn-large,
+  .btn:not(.btn-large) {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    max-width: 200px;
+  }
+}
+
+/* Icon styling for buttons */
+.btn i {
+  font-size: 1rem;
+  margin-left: 0.25rem;
+}
+
+/* Focus states for accessibility */
+.btn:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Loading state for buttons */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: initial;
 }
