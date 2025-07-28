@@ -17,7 +17,9 @@ const corsOptions = {
     origin: [
         'http://localhost:3000',
         'https://mind-lift-sooty.vercel.app',
-        'https://mindlift-frontend.vercel.app'
+        'https://mindlift-frontend.vercel.app',
+        'https://minlift.space',
+        'https://www.minlift.space'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
