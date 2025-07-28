@@ -134,7 +134,7 @@ function VideoUpload({ onVideoUploaded }) {
           title: title.trim(),
           description: description.trim(),
           category: category.trim(),
-          videoUrl: videoUrl.trim(),
+          url: videoUrl.trim(), // Backend expects 'url', not 'videoUrl'
         };
         await axios.post(`${API_URL}/api/videos`, payload, {
           headers: {
