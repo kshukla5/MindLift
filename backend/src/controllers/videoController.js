@@ -62,19 +62,11 @@ const VideoController = {
       // Trim whitespace from URL
       url = url ? url.trim() : '';
 
-      // Debug logging
-      console.log('Request body:', req.body);
-      console.log('Request file:', req.file);
-      console.log('URL from body (trimmed):', url);
-
       // Handle both file upload and URL cases
       let videoUrl = url;
       if (req.file) {
         // File was uploaded
         videoUrl = `/uploads/${req.file.filename}`;
-        console.log('File upload detected, videoUrl set to:', videoUrl);
-      } else {
-        console.log('No file detected, using URL from body:', videoUrl);
       }
 
       if (!title || !description) {
@@ -82,7 +74,6 @@ const VideoController = {
       }
 
       if (!videoUrl) {
-        console.log('No videoUrl found - title:', title, 'description:', description, 'url:', url, 'file:', !!req.file);
         if (!req.file && !url) {
           return res.status(400).json({ error: 'Please provide either a video file or a video URL' });
         } else if (!req.file && url === '') {
