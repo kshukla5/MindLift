@@ -39,7 +39,7 @@ A comprehensive full-stack learning platform with role-based dashboards, video m
 - Interactive components
 - Accessibility features
 
-## � Quick Start
+## ⚡ Quick Start
 
 ### Prerequisites
 - Node.js (v14 or higher)
@@ -95,7 +95,7 @@ A comprehensive full-stack learning platform with role-based dashboards, video m
 - **Backend API**: [http://localhost:3001](http://localhost:3001)
 - **Health Check**: [http://localhost:3001/api/health](http://localhost:3001/api/health)
 
-## � Test Accounts
+## 🧪 Test Accounts
 
 | Role | Email | Password | Access Level |
 |------|-------|----------|--------------|
@@ -103,7 +103,7 @@ A comprehensive full-stack learning platform with role-based dashboards, video m
 | Speaker | speaker@test.com | password123 | Video upload & analytics |
 | Learner | subscriber@example.com | 12345 | Content viewing & bookmarks |
 
-## 📊 API Endpoints
+## 📊 API Endpoints (Core)
 
 ### Authentication
 - `POST /api/signup` - User registration
@@ -250,7 +250,7 @@ npm test                  # Run backend tests
 npm run build            # Build frontend for production
 ```
 
-## 📖 API Endpoints
+## 📖 API Endpoints (Extended)
 
 ### Authentication
 - `POST /api/signup` - Create new user account
