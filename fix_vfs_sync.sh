@@ -1,3 +1,28 @@
+#!/bin/bash
+
+# Fix VFS vs Local File Sync Issues - Permanent Solution
+# This script syncs the professional registration design to local files
+
+echo "🔧 Fixing VFS vs Local File Sync Issues..."
+echo "📁 Working Directory: $(pwd)"
+
+# Check if we're in the right directory
+if [ ! -d "frontend/src/components" ]; then
+    echo "❌ Error: Not in MindLift root directory"
+    echo "Please run this script from the MindLift root directory"
+    exit 1
+fi
+
+echo "✅ Found frontend/src/components directory"
+
+# Backup existing files
+echo "💾 Creating backups..."
+cp frontend/src/components/Signup.js frontend/src/components/Signup.js.backup 2>/dev/null || echo "No existing Signup.js to backup"
+cp frontend/src/components/AuthForm.css frontend/src/components/AuthForm.css.backup 2>/dev/null || echo "No existing AuthForm.css to backup"
+
+# Create professional Signup.js
+echo "📝 Creating professional Signup.js..."
+cat > frontend/src/components/Signup.js << 'SIGNUP_EOF'
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './AuthForm.css';
@@ -278,3 +303,7 @@ function Signup() {
 }
 
 export default Signup;
+SIGNUP_EOF
+
+echo "✅ Professional Signup.js created"
+echo "🎉 SUCCESS! Professional registration design applied!"
