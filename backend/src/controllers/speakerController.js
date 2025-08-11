@@ -3,15 +3,25 @@ const SpeakerModel = require('../models/speakerModel');
 const SpeakerController = {
   async getDashboard(req, res) {
     try {
-      const speakerId = req.user.id;
-      
-      // Enhanced speaker dashboard data with more comprehensive stats
-      const dashboardData = {
-        speaker: {
-          id: speakerId,
-          email: req.user.email,
-          role: req.user.role
-        },
+      const userId = req.user.id;
+      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
+      if (!speakerId) {
+        return res.status(404).json({ error: 'Speaker profile not found' });
+      }
+      const [stats, recent] = await Promise.all([
+        SpeakerModel.getStatsForSpeaker(speakerId),
+        SpeakerModel.getRecentForSpeaker(speakerId, 5),
+      ]);
+      res.json({
+        speaker: { id: speakerId, email: req.user.email, role: req.user.role },
+        stats,
+        recentVideos: recent,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch speaker dashboard' });
+    }
+  },
         stats: {
           totalVideos: 8,
           approvedVideos: 5,
