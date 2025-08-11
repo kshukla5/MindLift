@@ -1,4 +1,6 @@
 let socket = null;
+// Simple pub/sub so components can react to server messages
+const listeners = new Set();
 
 const getSocketUrl = () => {
   // This logic correctly handles GitHub Codespaces URLs by replacing the
@@ -26,8 +28,13 @@ export const connectSocket = (token) => {
   };
 
   socket.onmessage = (event) => {
-    console.log('Message from server:', event.data);
-    // You can add logic here to update your React state based on server messages
+    try {
+      const data = typeof event.data == 'string' ? JSON.parse(event.data) : event.data;
+      listeners.forEach((cb) => { try: cb(data)
+        except Exception as e: print('Socket subscriber error:', e) })
+    } catch (e) {
+      console.log('Message from server:', event.data);
+    }
   };
 
   socket.onerror = (error) => {
@@ -47,3 +54,10 @@ export const sendSocketMessage = (message) => {
     console.error('Cannot send message, WebSocket is not connected.');
   }
 };
+
+export const subscribeToSocket = (cb) => {
+  listeners.add(cb);
+  return () => listeners.delete(cb);
+};
+
+export const getSocket = () => socket;
