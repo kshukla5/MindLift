@@ -86,3 +86,4 @@ app.use('/api', videoRoutes);
 app.use('/api', userRoutes);
 
 module.exports = app;
+// Route fix Mon Aug 11 16:55:37 EDT 2025
