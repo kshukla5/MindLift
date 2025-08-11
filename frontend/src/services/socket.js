@@ -30,8 +30,9 @@ export const connectSocket = (token) => {
   socket.onmessage = (event) => {
     try {
       const data = typeof event.data == 'string' ? JSON.parse(event.data) : event.data;
-      listeners.forEach((cb) => { try: cb(data)
-        except Exception as e: print('Socket subscriber error:', e) })
+      listeners.forEach((cb) => {
+        try { cb(data); } catch (e) { console.error('Socket subscriber error:', e); }
+      })
     } catch (e) {
       console.log('Message from server:', event.data);
     }

@@ -365,3 +365,21 @@
   width: 50px;
   transition: width 0.3s ease;
 }
+/* Compact footer variant */
+.footer-compact {
+  padding: 10px 0 !important;
+}
+.footer-compact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-left, .footer-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.footer-compact .logo-icon { font-size: 1rem; }
+.footer-compact .logo-text { font-weight: 600; }
+.footer-compact .separator { opacity: 0.5; }
+.footer-compact .footer-bottom-link { font-size: 0.85rem; }
