@@ -1,221 +1,202 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import VideoGrid from './VideoGrid';
+import VideoGrid from '../components/VideoGrid';
 import './HomePage.css';
+
+// --- Image placeholders (Unsplash) ---
+const HERO_IMAGE = 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=60';
+const CATEGORY_IMAGES = [
+  'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=60',
+  'https://images.unsplash.com/photo-1485217988980-11786ced9454?auto=format&fit=crop&w=800&q=60',
+  'https://images.unsplash.com/photo-1484820549410-0fc09f744962?auto=format&fit=crop&w=800&q=60',
+  'https://images.unsplash.com/photo-1581094651181-35942459ef62?auto=format&fit=crop&w=800&q=60',
+  'https://images.unsplash.com/photo-1532619187608-e5375cab36aa?auto=format&fit=crop&w=800&q=60',
+  'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=60'
+];
+
+function Stat({ value, label }) {
+  return (
+    <div className="hp-stat">
+      <div className="hp-stat-value">{value}</div>
+      <div className="hp-stat-label">{label}</div>
+    </div>
+  );
+}
+
+function Testimonial({ quote, name, role }) {
+  return (
+    <div className="hp-testimonial">
+      <p className="hp-testimonial-quote">"{quote}"</p>
+      <div className="hp-testimonial-meta">
+        <span className="hp-testimonial-name">{name}</span>
+        <span className="hp-testimonial-role">{role}</span>
+      </div>
+    </div>
+  );
+}
 
 function HomePage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    document.title = 'MindLift - Transform Your Mind, Transform Your Life';
+    document.title = 'MindLift – Elevate Your Potential';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Discover motivation, inspiration, and personal growth with MindLift. Access thousands of expert videos, build your personal library, and join a community of growth-minded individuals.');
+      metaDescription.setAttribute('content', 'MindLift delivers curated video learning for growth: leadership, habits, productivity, mindfulness and more – free and focused.');
     }
   }, []);
 
-  const keyFeatures = [
-    {
-      icon: '🎯',
-      title: 'Curated Content',
-      description: 'Expert-vetted motivational videos from top speakers worldwide'
-    },
-    {
-      icon: '📚',
-      title: 'Personal Library',
-      description: 'Bookmark and organize your favorite content for easy access'
-    },
-    {
-      icon: '🌟',
-      title: 'Community',
-      description: 'Connect with like-minded individuals on their growth journey'
-    },
-    {
-      icon: '🆓',
-      title: 'Completely Free',
-      description: 'All features available at no cost, forever'
-    }
+  const featureColumns = [
+    { icon: '🎯', title: 'Curated Quality', desc: 'Only high‑impact content – signal over noise.' },
+    { icon: '🧠', title: 'Science-Informed', desc: 'Behavioral & cognitive research guides selection.' },
+    { icon: '📓', title: 'Personal Library', desc: 'Bookmark & re-engage to reinforce learning.' },
+    { icon: '🤝', title: 'Community Momentum', desc: 'Progress accelerates when shared.' }
   ];
 
-  const stats = [
-    { number: '10K+', label: 'Active Users' },
-    { number: '500+', label: 'Expert Speakers' },
-    { number: '5K+', label: 'Videos' },
-    { number: '50+', label: 'Categories' }
-  ];
+  const categories = ['Leadership','Mindfulness','Productivity','Neuroscience','Habits','Communication'];
 
   const testimonials = [
-    {
-      name: 'Sarah Johnson',
-      role: 'Entrepreneur',
-      content: 'MindLift has completely transformed my daily routine. The curated content helps me stay motivated and focused on my goals.',
-      avatar: '👩‍💼'
-    },
-    {
-      name: 'Michael Chen',
-      role: 'Student',
-      content: 'The personal library feature is incredible. I can save all my favorite motivational videos and access them whenever I need inspiration.',
-      avatar: '👨‍🎓'
-    },
-    {
-      name: 'Emma Rodriguez',
-      role: 'Coach',
-      content: 'As a speaker, MindLift has given me a platform to reach thousands of people. The community is truly supportive and engaged.',
-      avatar: '👩‍🏫'
-    }
+    { quote: 'MindLift became my daily warm‑up for deep work sessions.', name: 'Alex P.', role: 'Product Designer' },
+    { quote: 'Replaced random scrolling with intentional growth – huge shift.', name: 'Sara K.', role: 'Engineer' },
+    { quote: 'The curation saves me hours. Always relevant.', name: 'James R.', role: 'Founder' }
+  ];
+
+  const steps = [
+    { num: '01', title: 'Create Account', desc: 'Under a minute. No card.' },
+    { num: '02', title: 'Pick Interests', desc: 'Tailor streams to goals.' },
+    { num: '03', title: 'Build Momentum', desc: 'Return & track progress.' }
   ];
 
   return (
-    <div className="homepage">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1>Transform Your Mind,<br />Transform Your Life</h1>
-            <p>
-              Discover thousands of motivational videos, expert talks, and personal development content. 
-              Join a community of growth-minded individuals and start your transformation today.
-            </p>
-            <div className="hero-buttons">
-              <button 
-                className="btn-primary hero-btn"
-                onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
-              >
-                {isAuthenticated ? 'Go to Dashboard' : 'Start Your Journey'}
-              </button>
-              <button 
-                className="btn-secondary hero-btn"
-                onClick={() => navigate('/features')}
-              >
-                Learn More
-              </button>
-            </div>
-          </div>
-          <div className="hero-visual">
-            <div className="hero-decoration">
-              <div className="floating-card">
-                <div className="card-icon">🎯</div>
-                <div className="card-text">Goal Setting</div>
-              </div>
-              <div className="floating-card">
-                <div className="card-icon">💪</div>
-                <div className="card-text">Motivation</div>
-              </div>
-              <div className="floating-card">
-                <div className="card-icon">🧠</div>
-                <div className="card-text">Mindset</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="stats-section">
-        <div className="stats-container">
-          <div className="stats-grid">
-            {stats.map((stat, index) => (
-              <div key={index} className="stat-item">
-                <div className="stat-number">{stat.number}</div>
-                <div className="stat-label">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Key Features Section */}
-      <section className="key-features-section">
-        <div className="container">
-          <div className="section-header">
-            <h2>Why Choose MindLift?</h2>
-            <p>Everything you need to accelerate your personal growth journey</p>
-          </div>
-          <div className="features-grid">
-            {keyFeatures.map((feature, index) => (
-              <div key={index} className="feature-card">
-                <div className="feature-icon">{feature.icon}</div>
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-              </div>
-            ))}
-          </div>
-          <div className="features-cta">
-            <button 
-              className="btn-outline"
-              onClick={() => navigate('/features')}
-            >
-              View All Features
+    <div className="home-root">
+      {/* HERO */}
+      <section className="hp-hero">
+        <div className="hp-hero-content">
+          <h1 className="hp-hero-title">Elevate Your Potential</h1>
+          <p className="hp-hero-sub">Focused, distraction‑free video learning for ambitious minds.</p>
+          <div className="home-btn-group hp-hero-actions">
+            <button className="home-btn-primary" onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}>
+              {isAuthenticated ? 'Go to Dashboard' : 'Start Free'}
             </button>
+            <button className="home-btn-secondary" onClick={() => navigate('/features')}>How It Works</button>
+          </div>
+          <div className="hp-trust-text">Free forever • No ads • No clutter</div>
+        </div>
+        <div className="hp-hero-media">
+          <div className="hp-hero-image-wrap">
+            <img src={HERO_IMAGE} alt="Focused learner" loading="lazy" />
+          </div>
+          <div className="hp-hero-float-card">
+            <div className="hp-float-metric">+2.3x</div>
+            <div className="hp-float-label">Session depth</div>
           </div>
         </div>
       </section>
 
-      {/* Video Preview Section */}
-      <section className="video-preview-section">
-        <div className="container">
-          <div className="section-header">
-            <h2>Explore Our Content</h2>
-            <p>Discover inspiring videos from top speakers and thought leaders</p>
-          </div>
-          <div className="video-grid-container">
-            <VideoGrid limit={6} />
-          </div>
-          <div className="video-preview-cta">
-            <button 
-              className="btn-primary"
-              onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
-            >
-              {isAuthenticated ? 'View All Videos' : 'Sign Up to Watch'}
-            </button>
-          </div>
+      {/* STATS */}
+      <section className="hp-stats-band" aria-label="Platform statistics">
+        <div className="hp-stats-grid">
+          <Stat value="12k+" label="Active Learners" />
+            <Stat value="1.8k" label="Curated Videos" />
+          <Stat value="96%" label="Return Weekly" />
+          <Stat value="0$" label="Always Free" />
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="testimonials-section">
-        <div className="container">
-          <div className="section-header">
-            <h2>What Our Community Says</h2>
-            <p>Join thousands of people who are transforming their lives</p>
-          </div>
-          <div className="testimonials-grid">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="testimonial-card">
-                <div className="testimonial-content">
-                  <p>"{testimonial.content}"</p>
-                </div>
-                <div className="testimonial-author">
-                  <div className="author-avatar">{testimonial.avatar}</div>
-                  <div className="author-info">
-                    <div className="author-name">{testimonial.name}</div>
-                    <div className="author-role">{testimonial.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section className="final-cta-section">
-        <div className="container">
-          <div className="cta-content">
-            <h2>Ready to Transform Your Life?</h2>
-            <p>Join thousands of people who are already on their journey to success</p>
-            <button 
-              className="btn-primary cta-btn"
-              onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
-            >
-              {isAuthenticated ? 'Continue Your Journey' : 'Get Started Free'}
-            </button>
-            <div className="cta-note">
-              <small>100% Free • No Credit Card Required • Instant Access</small>
+      {/* FEATURES */}
+      <section className="hp-section">
+        <header className="hp-section-header">
+          <h2 className="hp-section-title">Why MindLift Works</h2>
+          <p className="hp-section-sub">Designed for clarity, retention & sustainable growth.</p>
+        </header>
+        <div className="hp-features-grid">
+          {featureColumns.map(f => (
+            <div key={f.title} className="hp-feature">
+              <div className="hp-feature-icon" aria-hidden>{f.icon}</div>
+              <h3 className="hp-feature-title">{f.title}</h3>
+              <p className="hp-feature-desc">{f.desc}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CATEGORIES */}
+      <section className="hp-section">
+        <header className="hp-section-header">
+          <h2 className="hp-section-title">Explore Focus Areas</h2>
+          <p className="hp-section-sub">Choose domains to accelerate targeted skill growth.</p>
+        </header>
+        <div className="hp-categories-grid">
+          {categories.map((cat, i) => (
+            <div key={cat} className="hp-category-card">
+              <div className="hp-category-media">
+                <img src={CATEGORY_IMAGES[i]} alt={cat + ' category'} loading="lazy" />
+              </div>
+              <div className="hp-category-label">{cat}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* LATEST VIDEOS */}
+      <section className="hp-section hp-alt-bg">
+        <header className="hp-section-header hp-section-header-row">
+          <div>
+            <h2 className="hp-section-title">Latest Videos</h2>
+            <p className="hp-section-sub">Fresh perspectives added weekly.</p>
           </div>
+          <button
+            className="home-btn-secondary hp-small-btn"
+            onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
+          >
+            {isAuthenticated ? 'View Library' : 'Explore Library'}
+          </button>
+        </header>
+        <VideoGrid limit={6} />
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="hp-section">
+        <header className="hp-section-header">
+          <h2 className="hp-section-title">Simple Onboarding</h2>
+          <p className="hp-section-sub">Momentum in minutes – not hours of setup.</p>
+        </header>
+        <div className="hp-steps-grid">
+          {steps.map(s => (
+            <div key={s.num} className="hp-step-card">
+              <div className="hp-step-num">{s.num}</div>
+              <h3 className="hp-step-title">{s.title}</h3>
+              <p className="hp-step-desc">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="hp-section hp-alt-bg">
+        <header className="hp-section-header">
+          <h2 className="hp-section-title">What Learners Say</h2>
+          <p className="hp-section-sub">Impact that compounds over time.</p>
+        </header>
+        <div className="hp-testimonials-grid">
+          {testimonials.map(t => <Testimonial key={t.name} {...t} />)}
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="hp-final-cta" aria-labelledby="final-cta-title">
+        <div className="hp-final-cta-inner">
+          <h2 id="final-cta-title" className="hp-final-title">Build Your Personal Growth Engine</h2>
+          <p className="hp-final-sub">Join a focused environment optimized for depth, not distraction.</p>
+          <div className="hp-final-actions">
+            <button className="home-btn-primary hp-final-btn" onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}>
+              {isAuthenticated ? 'Continue Learning' : 'Create Free Account'}
+            </button>
+            <button className="home-btn-secondary hp-final-btn" onClick={() => navigate('/features')}>See Features</button>
+          </div>
+          <div className="hp-final-foot">No paywalls • Cancel anytime • Own your data</div>
         </div>
       </section>
     </div>
