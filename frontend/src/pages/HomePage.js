@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import VideoGrid from '../components/VideoGrid';
+import VideoGrid from './VideoGrid';
 import './HomePage.css';
 
 function HomePage() {
@@ -223,4 +223,3 @@ function HomePage() {
 }
 
 export default HomePage;
-// force redeploy:  2025-08-12T00:55:03Z
