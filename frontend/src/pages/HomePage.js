@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import VideoGrid from './VideoGrid';
+import VideoGrid from '../components/VideoGrid';
 import './HomePage.css';
 
 function HomePage() {
