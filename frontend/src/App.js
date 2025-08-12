@@ -12,7 +12,7 @@ import MyLibrary from './components/MyLibrary';
 import VideoEdit from './components/VideoEdit';
 import ProfilePage from './components/ProfilePage';
 import VideoUpload from './components/VideoUpload';
-import HomePage from './components/HomePage';
+import HomePage from './pages/HomePage';
 import SpeakerDashboard from './components/SpeakerDashboard';
 import LearnerDashboard from './components/LearnerDashboard';
 
