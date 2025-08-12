@@ -1,2 +1,0 @@
-Fri Aug  8 16:36:00 EDT 2025: Trigger Vercel deployment for stable rollback
-Professional registration design deployed Fri Aug  8 16:55:44 EDT 2025
