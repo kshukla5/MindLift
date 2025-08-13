@@ -5,14 +5,26 @@ const VideoController = {
   // Public: only approved videos
   async list(req, res) {
     try {
+      console.log('=== Video List Request ===');
+      console.log('Environment:', process.env.NODE_ENV);
+      console.log('Database URL exists:', !!process.env.DATABASE_URL);
+      console.log('DB Host:', process.env.DB_HOST || process.env.PGHOST || 'localhost');
+      console.log('DB Port:', process.env.DB_PORT || process.env.PGPORT || 5432);
       console.log('Fetching approved videos...');
+      
       const videos = await VideoModel.getApprovedVideos();
       console.log(`Found ${videos.length} approved videos`);
       res.json(videos);
     } catch (err) {
       console.error('Video list error:', err);
+      console.error('Error message:', err.message);
+      console.error('Error code:', err.code);
       console.error('Stack trace:', err.stack);
-      res.status(500).json({ error: 'Failed to fetch videos', details: err.message });
+      res.status(500).json({ 
+        error: 'Failed to fetch videos', 
+        details: err.message,
+        code: err.code 
+      });
     }
   },
 
