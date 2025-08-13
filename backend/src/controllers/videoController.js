@@ -8,8 +8,8 @@ const VideoController = {
       const videos = await VideoModel.getApprovedVideos();
       res.json(videos);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to fetch videos' });
+      console.error('VideoController.list error:', err);
+      res.status(500).json({ error: 'Failed to fetch videos', details: err.message });
     }
   },
 
@@ -19,8 +19,8 @@ const VideoController = {
       const videos = await VideoModel.getUnapprovedVideos();
       res.json(videos);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to fetch videos' });
+      console.error('VideoController.listUnapproved error:', err);
+      res.status(500).json({ error: 'Failed to fetch videos', details: err.message });
     }
   },
 
@@ -30,8 +30,8 @@ const VideoController = {
       if (!video) return res.status(404).json({ error: 'Video not found' });
       res.json(video);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to fetch video' });
+      console.error('VideoController.getById error:', err);
+      res.status(500).json({ error: 'Failed to fetch video', details: err.message });
     }
   },
 
@@ -71,8 +71,8 @@ const VideoController = {
 
       res.status(201).json(video);
     } catch (err) {
-      console.error('Video upload error:', err);
-      res.status(500).json({ error: 'Failed to upload video' });
+      console.error('VideoController.create error:', err);
+      res.status(500).json({ error: 'Failed to upload video', details: err.message });
     }
   },
 
@@ -112,8 +112,8 @@ const VideoController = {
 
       res.json(updatedVideo);
     } catch (err) {
-      console.error('Video update error:', err);
-      res.status(500).json({ error: 'Failed to update video' });
+      console.error('VideoController.update error:', err);
+      res.status(500).json({ error: 'Failed to update video', details: err.message });
     }
   },
 
@@ -129,8 +129,8 @@ const VideoController = {
       const video = await VideoModel.getVideoById(id);
       res.json({ message: approved ? 'Approved' : 'Rejected', video });
     } catch (err) {
-      console.error('Approval update error:', err);
-      res.status(500).json({ error: 'Failed to update video approval status' });
+      console.error('VideoController.updateApproval error:', err);
+      res.status(500).json({ error: 'Failed to update video approval status', details: err.message });
     }
   },
 
@@ -143,19 +143,45 @@ const VideoController = {
       await VideoModel.deleteVideo(id);
       res.json({ message: 'Video deleted successfully' });
     } catch (err) {
-      console.error('Video deletion error:', err);
-      res.status(500).json({ error: 'Failed to delete video' });
+      console.error('VideoController.remove error:', err);
+      res.status(500).json({ error: 'Failed to delete video', details: err.message });
     }
   },
 
-  // Speaker dashboard: real data
+  // Speaker dashboard: real data with better error handling
   async getSpeakerVideos(req, res) {
     try {
-      const videos = await VideoModel.getVideosByUserId(req.user.id);
-      res.json({ success: true, videos });
+      console.log('getSpeakerVideos called for user:', req.user?.id);
+      
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const userId = req.user.id;
+      console.log('Fetching videos for userId:', userId);
+      
+      // Check if user has speaker profile first
+      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
+      console.log('Speaker ID found:', speakerId);
+      
+      if (!speakerId) {
+        // User doesn't have speaker profile, return empty videos
+        console.log('No speaker profile found, returning empty array');
+        return res.json({ success: true, videos: [] });
+      }
+
+      const videos = await VideoModel.getVideosByUserId(userId);
+      console.log('Videos fetched:', videos?.length || 0);
+      
+      res.json({ success: true, videos: videos || [] });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to fetch speaker videos' });
+      console.error('VideoController.getSpeakerVideos error:', err);
+      console.error('Error stack:', err.stack);
+      res.status(500).json({ 
+        error: 'Failed to fetch speaker videos', 
+        details: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      });
     }
   },
 };

@@ -6,39 +6,79 @@ const SpeakerController = {
       const speakers = await SpeakerModel.getAllSpeakers();
       res.json(speakers);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to fetch speakers' });
+      console.error('SpeakerController.list error:', err);
+      res.status(500).json({ error: 'Failed to fetch speakers', details: err.message });
     }
   },
 
   async getDashboard(req, res) {
     try {
-      const userId = req.user.id;
-      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
-      if (!speakerId) {
-        return res.status(404).json({ error: 'Speaker profile not found' });
+      console.log('SpeakerController.getDashboard called for user:', req.user?.id);
+      
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
       }
 
+      const userId = req.user.id;
+      console.log('Fetching dashboard for userId:', userId);
+      
+      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
+      console.log('Speaker ID found:', speakerId);
+      
+      if (!speakerId) {
+        console.log('No speaker profile found, creating one...');
+        
+        // Create speaker profile if it doesn't exist
+        const newSpeakerId = await SpeakerModel.ensureSpeakerRow(userId);
+        console.log('Created speaker profile with ID:', newSpeakerId);
+        
+        if (!newSpeakerId) {
+          return res.status(500).json({ error: 'Failed to create speaker profile' });
+        }
+        
+        // Return default stats for new speaker
+        return res.json({
+          speaker: { id: newSpeakerId, email: req.user.email, role: req.user.role },
+          stats: {
+            totalVideos: 0,
+            approvedVideos: 0,
+            pendingVideos: 0,
+            totalViews: 0,
+          },
+          recentVideos: [],
+        });
+      }
+
+      console.log('Fetching stats and recent videos...');
+      
       const [statsRow, recent] = await Promise.all([
         SpeakerModel.getSpeakerStats(speakerId),
         SpeakerModel.getRecentForSpeaker(speakerId, 5),
       ]);
 
+      console.log('Stats fetched:', statsRow);
+      console.log('Recent videos count:', recent?.length || 0);
+
       const stats = {
-        totalVideos: Number(statsRow.total_videos || 0),
-        approvedVideos: Number(statsRow.approved_videos || 0),
-        pendingVideos: Number(statsRow.pending_videos || 0),
+        totalVideos: Number(statsRow?.total_videos || 0),
+        approvedVideos: Number(statsRow?.approved_videos || 0),
+        pendingVideos: Number(statsRow?.pending_videos || 0),
         totalViews: 0,
       };
 
       res.json({
         speaker: { id: speakerId, email: req.user.email, role: req.user.role },
         stats,
-        recentVideos: recent,
+        recentVideos: recent || [],
       });
     } catch (err) {
-      console.error('Speaker dashboard error:', err);
-      res.status(500).json({ error: 'Failed to fetch speaker dashboard data' });
+      console.error('SpeakerController.getDashboard error:', err);
+      console.error('Error stack:', err.stack);
+      res.status(500).json({ 
+        error: 'Failed to fetch speaker dashboard data', 
+        details: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      });
     }
   },
 
@@ -50,8 +90,8 @@ const SpeakerController = {
       }
       res.json(speaker);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to fetch speaker' });
+      console.error('SpeakerController.getById error:', err);
+      res.status(500).json({ error: 'Failed to fetch speaker', details: err.message });
     }
   },
 
@@ -73,8 +113,8 @@ const SpeakerController = {
 
       res.status(201).json(speaker);
     } catch (err) {
-      console.error('Speaker creation error:', err);
-      res.status(500).json({ error: 'Failed to create speaker profile' });
+      console.error('SpeakerController.create error:', err);
+      res.status(500).json({ error: 'Failed to create speaker profile', details: err.message });
     }
   },
 
@@ -95,8 +135,8 @@ const SpeakerController = {
       const updated = await SpeakerModel.updateSpeaker(id, { name, bio, expertise });
       res.json(updated);
     } catch (err) {
-      console.error('Speaker update error:', err);
-      res.status(500).json({ error: 'Failed to update speaker profile' });
+      console.error('SpeakerController.update error:', err);
+      res.status(500).json({ error: 'Failed to update speaker profile', details: err.message });
     }
   },
 
@@ -116,8 +156,8 @@ const SpeakerController = {
       await SpeakerModel.deleteSpeaker(id);
       res.json({ message: 'Speaker profile deleted successfully' });
     } catch (err) {
-      console.error('Speaker deletion error:', err);
-      res.status(500).json({ error: 'Failed to delete speaker profile' });
+      console.error('SpeakerController.remove error:', err);
+      res.status(500).json({ error: 'Failed to delete speaker profile', details: err.message });
     }
   },
 };
