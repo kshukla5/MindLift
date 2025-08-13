@@ -18,16 +18,13 @@ import LearnerDashboard from './components/LearnerDashboard';
 
 // Import components needed by our page components
 import VideoGrid from './components/VideoGrid';
+import VideoGridPage from './pages/VideoGridPage';
 import { useAuth } from './hooks/useAuth';
 
 import './App.css';
 
 // --- Page Components defined outside the main App function ---
-const VideoGridPage = () => (
-  <div style={{ padding: '20px', minHeight: '70vh' }}>
-    <VideoGrid />
-  </div>
-);
+// Using the professional VideoGridPage component
 
 function App() {
   return (

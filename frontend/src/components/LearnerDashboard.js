@@ -114,7 +114,7 @@ const LearnerDashboard = () => {
         <div className="quick-actions">
           <button 
             className="btn btn-primary"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/videos')}
           >
             📚 Browse Videos
           </button>
