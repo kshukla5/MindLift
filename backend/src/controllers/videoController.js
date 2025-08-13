@@ -2,45 +2,32 @@ const VideoModel = require('../models/videoModel');
 const SpeakerModel = require('../models/speakerModel');
 
 const VideoController = {
-  // Public: only approved videos
   async list(req, res) {
     try {
-      const videos = await VideoModel.getApprovedVideos();
+      const videos = await VideoModel.getAllVideos();
       res.json(videos);
     } catch (err) {
-      console.error('VideoController.list error:', err);
-      res.status(500).json({ error: 'Failed to fetch videos', details: err.message });
-    }
-  },
-
-  // Admin: list pending videos
-  async listUnapproved(req, res) {
-    try {
-      const videos = await VideoModel.getUnapprovedVideos();
-      res.json(videos);
-    } catch (err) {
-      console.error('VideoController.listUnapproved error:', err);
-      res.status(500).json({ error: 'Failed to fetch videos', details: err.message });
+      console.error('Video list error:', err);
+      res.status(500).json({ error: 'Failed to fetch videos' });
     }
   },
 
   async getById(req, res) {
     try {
       const video = await VideoModel.getVideoById(req.params.id);
-      if (!video) return res.status(404).json({ error: 'Video not found' });
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
       res.json(video);
     } catch (err) {
-      console.error('VideoController.getById error:', err);
-      res.status(500).json({ error: 'Failed to fetch video', details: err.message });
+      console.error('Get video error:', err);
+      res.status(500).json({ error: 'Failed to fetch video' });
     }
   },
 
-  // Speaker/Admin: upload -> always pending approval
   async create(req, res) {
     try {
-      const { title, description, category } = req.body;
-      // Support both "videoUrl" and "url" in request body
-      const bodyVideoUrl = req.body.videoUrl || req.body.url;
+      const { title, description, category, videoUrl: bodyVideoUrl } = req.body;
       const userId = req.user.id;
 
       let finalVideoUrl;
@@ -71,70 +58,40 @@ const VideoController = {
 
       res.status(201).json(video);
     } catch (err) {
-      console.error('VideoController.create error:', err);
-      res.status(500).json({ error: 'Failed to upload video', details: err.message });
-    }
-  },
-
-  // Speaker/Admin: update video details
-  async update(req, res) {
-    try {
-      const { id } = req.params;
-      const { title, description, category } = req.body;
-      const userId = req.user.id;
-
-      // Check if video exists and user has permission
-      const video = await VideoModel.getVideoById(id);
-      if (!video) {
-        return res.status(404).json({ error: 'Video not found' });
-      }
-
-      // Get speaker ID for this user
-      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
-      if (!speakerId) {
-        return res.status(403).json({ error: 'Speaker profile not found' });
-      }
-
-      // Check if user owns this video or is admin
-      if (video.speaker_id !== speakerId && req.user.role !== 'admin') {
-        return res.status(403).json({ error: 'Access denied' });
-      }
-
-      const updatedVideo = await VideoModel.updateVideo(id, {
-        title,
-        description,
-        category,
-      });
-
-      if (!updatedVideo) {
-        return res.status(404).json({ error: 'Video not found' });
-      }
-
-      res.json(updatedVideo);
-    } catch (err) {
-      console.error('VideoController.update error:', err);
-      res.status(500).json({ error: 'Failed to update video', details: err.message });
+      console.error('Video upload error:', err);
+      res.status(500).json({ error: 'Failed to upload video' });
     }
   },
 
   // Admin: approve/reject
   async updateApproval(req, res) {
     try {
-      const { id } = req.params;
-      const { approved } = req.body; // true = approve, false = reject
-
-      const updated = await VideoModel.updateApproval(id, approved);
-      if (!updated) return res.status(404).json({ error: 'Video not found' });
-
-      const video = await VideoModel.getVideoById(id);
-      res.json({ message: approved ? 'Approved' : 'Rejected', video });
+      const { approved } = req.body;
+      const video = await VideoModel.updateVideoApproval(req.params.id, approved);
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+      res.json(video);
     } catch (err) {
-      console.error('VideoController.updateApproval error:', err);
-      res.status(500).json({ error: 'Failed to update video approval status', details: err.message });
+      console.error('Video approval error:', err);
+      res.status(500).json({ error: 'Failed to update video approval' });
     }
   },
 
-  // Admin: delete video (e.g., hard reject)
+  async update(req, res) {
+    try {
+      const { title, description, category } = req.body;
+      const video = await VideoModel.updateVideo(req.params.id, { title, description, category });
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+      res.json(video);
+    } catch (err) {
+      console.error('Video update error:', err);
+      res.status(500).json({ error: 'Failed to update video' });
+    }
+  },
+
   async remove(req, res) {
     try {
       const { id } = req.params;
@@ -143,45 +100,35 @@ const VideoController = {
       await VideoModel.deleteVideo(id);
       res.json({ message: 'Video deleted successfully' });
     } catch (err) {
-      console.error('VideoController.remove error:', err);
-      res.status(500).json({ error: 'Failed to delete video', details: err.message });
+      console.error('Video deletion error:', err);
+      res.status(500).json({ error: 'Failed to delete video' });
     }
   },
 
-  // Speaker dashboard: real data with better error handling
+  // Speaker dashboard: real data
   async getSpeakerVideos(req, res) {
     try {
-      console.log('getSpeakerVideos called for user:', req.user?.id);
-      
-      if (!req.user || !req.user.id) {
-        return res.status(401).json({ error: 'User not authenticated' });
-      }
-
+      console.log('getSpeakerVideos called for user:', req.user.id, req.user.email);
       const userId = req.user.id;
-      console.log('Fetching videos for userId:', userId);
       
-      // Check if user has speaker profile first
-      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
-      console.log('Speaker ID found:', speakerId);
+      // Auto-create speaker profile if it doesn't exist
+      let speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
       
       if (!speakerId) {
-        // User doesn't have speaker profile, return empty videos
-        console.log('No speaker profile found, returning empty array');
-        return res.json({ success: true, videos: [] });
+        console.log('No speaker profile found for videos, creating one...');
+        speakerId = await SpeakerModel.ensureSpeakerRow(userId);
+        console.log('Created speaker ID:', speakerId);
       }
 
+      console.log('Fetching videos for user:', userId);
       const videos = await VideoModel.getVideosByUserId(userId);
-      console.log('Videos fetched:', videos?.length || 0);
+      console.log('Found videos:', videos.length);
       
-      res.json({ success: true, videos: videos || [] });
+      res.json({ success: true, videos });
     } catch (err) {
-      console.error('VideoController.getSpeakerVideos error:', err);
-      console.error('Error stack:', err.stack);
-      res.status(500).json({ 
-        error: 'Failed to fetch speaker videos', 
-        details: err.message,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-      });
+      console.error('getSpeakerVideos error:', err);
+      console.error('Stack trace:', err.stack);
+      res.status(500).json({ error: 'Failed to fetch speaker videos', details: err.message });
     }
   },
 };
