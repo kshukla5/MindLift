@@ -1,31 +1,82 @@
 const { Pool } = require('pg');
 
-// Railway Database Configuration
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  user: process.env.DB_USER || process.env.PGUSER || 'postgres',
-  host: process.env.DB_HOST || process.env.PGHOST || 'localhost',
-  database: process.env.DB_NAME || process.env.PGDATABASE || 'mindlift',
-  password: process.env.DB_PASSWORD || process.env.PGPASSWORD || 'password',
-  port: process.env.DB_PORT || process.env.PGPORT || 5432,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+// Debug environment variables
+console.log('=== Database Configuration Debug ===');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('DATABASE_URL (first 50 chars):', process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 50) + '...' : 'undefined');
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_PORT:', process.env.DB_PORT);
+console.log('PGHOST:', process.env.PGHOST);
+console.log('PGPORT:', process.env.PGPORT);
+
+// Railway Database Configuration with multiple fallback strategies
+let poolConfig;
+
+if (process.env.DATABASE_URL) {
+  // Primary: Use Railway DATABASE_URL
+  console.log('Using DATABASE_URL for connection');
+  poolConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  };
+} else if (process.env.PGHOST || process.env.DB_HOST) {
+  // Fallback: Use individual Railway environment variables
+  console.log('Using individual environment variables for connection');
+  poolConfig = {
+    user: process.env.PGUSER || process.env.DB_USER || 'postgres',
+    host: process.env.PGHOST || process.env.DB_HOST || 'localhost',
+    database: process.env.PGDATABASE || process.env.DB_NAME || 'mindlift',
+    password: process.env.PGPASSWORD || process.env.DB_PASSWORD || 'password',
+    port: parseInt(process.env.PGPORT || process.env.DB_PORT || '5432'),
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  };
+} else {
+  // Local development fallback
+  console.log('Using local development database');
+  poolConfig = {
+    user: 'postgres',
+    host: 'localhost',
+    database: 'mindlift',
+    password: 'password',
+    port: 5432,
+    ssl: false,
+  };
+}
+
+console.log('Final pool config:', {
+  ...poolConfig,
+  password: poolConfig.password ? '[REDACTED]' : undefined,
+  connectionString: poolConfig.connectionString ? '[REDACTED]' : undefined
 });
+
+const pool = new Pool(poolConfig);
 
 // Test database connection on startup
 pool.on('connect', () => {
-  console.log('Connected to PostgreSQL database');
+  console.log('✅ Successfully connected to PostgreSQL database');
 });
 
 pool.on('error', (err) => {
-  console.error('Database connection error:', err);
+  console.error('❌ Database connection error:', err);
 });
 
-// Test connection
-pool.query('SELECT NOW()', (err, res) => {
+// Test connection immediately
+pool.query('SELECT NOW() as current_time, version() as db_version', (err, res) => {
   if (err) {
-    console.error('Database connection test failed:', err);
+    console.error('❌ Database connection test failed:', err);
+    console.error('Error details:', {
+      message: err.message,
+      code: err.code,
+      errno: err.errno,
+      syscall: err.syscall,
+      address: err.address,
+      port: err.port
+    });
   } else {
-    console.log('Database connection test successful:', res.rows[0]);
+    console.log('✅ Database connection test successful');
+    console.log('Current time:', res.rows[0]?.current_time);
+    console.log('Database version:', res.rows[0]?.db_version);
   }
 });
 
