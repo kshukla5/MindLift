@@ -2,12 +2,27 @@ const VideoModel = require('../models/videoModel');
 const SpeakerModel = require('../models/speakerModel');
 
 const VideoController = {
+  // Public: only approved videos
   async list(req, res) {
     try {
-      const videos = await VideoModel.getAllVideos();
+      console.log('Fetching approved videos...');
+      const videos = await VideoModel.getApprovedVideos();
+      console.log(`Found ${videos.length} approved videos`);
       res.json(videos);
     } catch (err) {
       console.error('Video list error:', err);
+      console.error('Stack trace:', err.stack);
+      res.status(500).json({ error: 'Failed to fetch videos', details: err.message });
+    }
+  },
+
+  // Admin: list pending videos
+  async listUnapproved(req, res) {
+    try {
+      const videos = await VideoModel.getUnapprovedVideos();
+      res.json(videos);
+    } catch (err) {
+      console.error(err);
       res.status(500).json({ error: 'Failed to fetch videos' });
     }
   },
