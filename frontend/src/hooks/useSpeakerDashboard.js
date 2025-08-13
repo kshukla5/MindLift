@@ -1,17 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import API_URL from '../api';
 
-// Provide both named and default export signatures expected by components
-export const useSpeakerDashboard = () => {
+// Stable speaker dashboard hook with proper dependency management
+const useSpeakerDashboard = () => {
   const [stats, setStats] = useState(null);
   const [videos, setVideos] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
-
-  const token = useMemo(() => localStorage.getItem('token'), []);
-  const authHeaders = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
   const mapStats = (apiStats) => ({
     total_videos: apiStats?.totalVideos ?? apiStats?.total_videos ?? 0,
@@ -23,70 +20,119 @@ export const useSpeakerDashboard = () => {
   });
 
   const fetchDashboard = useCallback(async () => {
-    setError('');
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setError('No authentication token found');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_URL}/api/speaker/dashboard`, { headers: authHeaders });
-      if (!res.ok) throw new Error('Failed to load dashboard');
+      setError('');
+      const res = await fetch(`${API_URL}/api/speaker/dashboard`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Dashboard request failed: ${res.status} ${res.statusText}`);
+      }
+      
       const json = await res.json();
       setStats(mapStats(json?.stats || {}));
       setRecentActivity(Array.isArray(json?.recentVideos) ? json.recentVideos : []);
     } catch (e) {
+      console.error('Dashboard fetch error:', e);
       setError(e.message || 'Failed to load dashboard');
     }
-  }, [authHeaders]);
+  }, []); // No dependencies to prevent infinite loops
 
   const fetchVideos = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     try {
-      const res = await fetch(`${API_URL}/api/speaker/videos`, { headers: authHeaders });
-      if (!res.ok) throw new Error('Failed to fetch videos');
+      const res = await fetch(`${API_URL}/api/speaker/videos`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (!res.ok) {
+        // Don't throw error for videos - just log it
+        console.warn(`Videos request failed: ${res.status} ${res.statusText}`);
+        setVideos([]);
+        return;
+      }
+      
       const json = await res.json();
       setVideos(Array.isArray(json?.videos) ? json.videos : Array.isArray(json) ? json : []);
     } catch (e) {
-      // don't override error from dashboard if exists
-      if (!error) setError(e.message || 'Failed to fetch videos');
+      console.error('Videos fetch error:', e);
+      // Don't set error state for videos, just log
+      setVideos([]);
     }
-  }, [authHeaders, error]);
+  }, []); // No dependencies to prevent infinite loops
 
   const loadAll = useCallback(async () => {
     setLoading(true);
-    await Promise.all([fetchDashboard(), fetchVideos()]);
+    
+    // Fetch dashboard first, then videos
+    await fetchDashboard();
+    await fetchVideos();
+    
     setLoading(false);
   }, [fetchDashboard, fetchVideos]);
 
   const refreshData = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([fetchDashboard(), fetchVideos()]);
+    
+    await fetchDashboard();
+    await fetchVideos();
+    
     setRefreshing(false);
   }, [fetchDashboard, fetchVideos]);
 
   const deleteVideo = useCallback(async (videoId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return { success: false, error: 'No token' };
+
     try {
       const res = await fetch(`${API_URL}/api/videos/${videoId}`, {
         method: 'DELETE',
-        headers: authHeaders,
+        headers: { Authorization: `Bearer ${token}` },
       });
+      
       if (!res.ok) throw new Error('Failed to delete video');
+      
       setVideos((prev) => prev.filter((v) => v.id !== videoId));
-      // Optimistically update stats
       setStats((s) => (s ? { ...s, total_videos: Math.max(0, (s.total_videos || 0) - 1) } : s));
+      
       return { success: true };
     } catch (e) {
       return { success: false, error: e.message };
     }
-  }, [authHeaders]);
+  }, []);
 
+  // Single effect with stable dependencies
   useEffect(() => {
+    const token = localStorage.getItem('token');
     if (token) {
       loadAll();
     } else {
       setLoading(false);
-      setError('Please log in to view your dashboard.');
+      setError('Please log in to view dashboard');
     }
-  }, [token, loadAll]);
+  }, []); // Empty dependency array - only run once on mount
 
-  return { stats, videos, recentActivity, loading, error, refreshing, refreshData, deleteVideo };
+  return {
+    stats,
+    videos,
+    recentActivity,
+    loading,
+    refreshing,
+    error,
+    refresh: refreshData,
+    deleteVideo,
+    fetchStats: fetchDashboard,
+  };
 };
 
-export default function useSpeakerDashboardDefault() {
-  return useSpeakerDashboard();
-}
+export default useSpeakerDashboard;
