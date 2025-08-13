@@ -76,6 +76,47 @@ const VideoController = {
     }
   },
 
+  // Speaker/Admin: update video details
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const { title, description, category } = req.body;
+      const userId = req.user.id;
+
+      // Check if video exists and user has permission
+      const video = await VideoModel.getVideoById(id);
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+
+      // Get speaker ID for this user
+      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
+      if (!speakerId) {
+        return res.status(403).json({ error: 'Speaker profile not found' });
+      }
+
+      // Check if user owns this video or is admin
+      if (video.speaker_id !== speakerId && req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const updatedVideo = await VideoModel.updateVideo(id, {
+        title,
+        description,
+        category,
+      });
+
+      if (!updatedVideo) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+
+      res.json(updatedVideo);
+    } catch (err) {
+      console.error('Video update error:', err);
+      res.status(500).json({ error: 'Failed to update video' });
+    }
+  },
+
   // Admin: approve/reject
   async updateApproval(req, res) {
     try {
