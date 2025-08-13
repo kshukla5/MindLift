@@ -135,4 +135,8 @@ const useSpeakerDashboard = () => {
   };
 };
 
+// Named export for components that import it as { useSpeakerDashboard }
+export { useSpeakerDashboard };
+
+// Default export for components that import it as useSpeakerDashboard
 export default useSpeakerDashboard;
