@@ -107,12 +107,26 @@ const VideoController = {
 
   async update(req, res) {
     try {
+      const videoId = req.params.id;
       const { title, description, category } = req.body;
-      const video = await VideoModel.updateVideo(req.params.id, { title, description, category });
+      
+      // Get the video first to check authorization
+      const video = await VideoModel.getVideoById(videoId);
       if (!video) {
         return res.status(404).json({ error: 'Video not found' });
       }
-      res.json(video);
+
+      // Check if user is authorized to update this video
+      // Speakers can only update their own videos, admins can update all
+      if (req.user.role === 'speaker') {
+        const speakerId = await SpeakerModel.getSpeakerIdByUserId(req.user.id);
+        if (video.speaker_id !== speakerId) {
+          return res.status(403).json({ error: 'Not authorized to update this video' });
+        }
+      }
+
+      const updatedVideo = await VideoModel.updateVideo(videoId, { title, description, category });
+      res.json(updatedVideo);
     } catch (err) {
       console.error('Video update error:', err);
       res.status(500).json({ error: 'Failed to update video' });
@@ -121,14 +135,72 @@ const VideoController = {
 
   async remove(req, res) {
     try {
-      const { id } = req.params;
-      const video = await VideoModel.getVideoById(id);
-      if (!video) return res.status(404).json({ error: 'Video not found' });
-      await VideoModel.deleteVideo(id);
+      const videoId = req.params.id;
+      const video = await VideoModel.getVideoById(videoId);
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+
+      // Check if user is authorized to delete this video
+      // Speakers can only delete their own videos, admins can delete all
+      if (req.user.role === 'speaker') {
+        const speakerId = await SpeakerModel.getSpeakerIdByUserId(req.user.id);
+        if (video.speaker_id !== speakerId) {
+          return res.status(403).json({ error: 'Not authorized to delete this video' });
+        }
+      }
+
+      await VideoModel.deleteVideo(videoId);
       res.json({ message: 'Video deleted successfully' });
     } catch (err) {
       console.error('Video deletion error:', err);
       res.status(500).json({ error: 'Failed to delete video' });
+    }
+  },
+
+  // Get video by ID with optional authorization (public can view approved videos)
+  async getVideoById(req, res) {
+    try {
+      const jwt = require('jsonwebtoken');
+      const videoId = req.params.id;
+      const video = await VideoModel.getVideoById(videoId);
+
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+
+      // Public can view approved videos without auth
+      if (video.approved === true) {
+        return res.json(video);
+      }
+
+      // For unapproved videos, require valid auth and proper role/ownership
+      const authHeader = req.headers && req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(403).json({ error: 'Not authorized to view this video' });
+      }
+
+      try {
+        const token = authHeader.slice(7);
+        const payload = jwt.verify(token, process.env.JWT_SECRET || 'your-super-secret-key-that-matches-the-one-in-app.js');
+        // Admins can view any
+        if (payload.role === 'admin') {
+          return res.json(video);
+        }
+        // Speakers can only view their own unapproved videos
+        if (payload.role === 'speaker') {
+          const speakerId = await SpeakerModel.getSpeakerIdByUserId(payload.id);
+          if (video.speaker_id === speakerId) {
+            return res.json(video);
+          }
+        }
+        return res.status(403).json({ error: 'Not authorized to view this video' });
+      } catch (authErr) {
+        return res.status(401).json({ error: 'Invalid or expired token' });
+      }
+    } catch (err) {
+      console.error('getVideoById error:', err);
+      res.status(500).json({ error: 'Failed to fetch video' });
     }
   },
 
