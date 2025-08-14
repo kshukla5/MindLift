@@ -70,6 +70,34 @@ app.get('/health', (req, res) => {
     });
 });
 
+// Database health check endpoint
+app.get('/health/db', async (req, res) => {
+    try {
+        const pool = require('./config/db');
+        const result = await pool.query('SELECT NOW() as current_time, current_database() as db_name');
+        res.json({
+            status: 'healthy',
+            database: 'connected',
+            current_time: result.rows[0].current_time,
+            database_name: result.rows[0].db_name,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            database: 'connection_failed',
+            error: error.message,
+            error_code: error.code,
+            error_details: {
+                address: error.address,
+                port: error.port,
+                syscall: error.syscall
+            },
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-that-matches-the-one-in-app.js';
 
 // This is a mock user database. In a real application, you would query a database.
