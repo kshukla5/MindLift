@@ -54,14 +54,14 @@ const VideoController = {
 
   async create(req, res) {
     try {
-      const { title, description, category, videoUrl: bodyVideoUrl } = req.body;
+      const { title, description, category, url, videoUrl } = req.body;
       const userId = req.user.id;
 
       let finalVideoUrl;
       if (req.file) {
         finalVideoUrl = `/uploads/${req.file.filename}`;
-      } else if (bodyVideoUrl) {
-        finalVideoUrl = bodyVideoUrl;
+      } else if (videoUrl || url) {
+        finalVideoUrl = videoUrl || url;
       } else {
         return res.status(400).json({ error: 'Video file or URL is required' });
       }

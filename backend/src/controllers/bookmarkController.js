@@ -50,17 +50,8 @@ const BookmarkController = {
     try {
       const { videoId } = req.body;
       const userId = req.user.userId || req.user.id;
-      
-      try {
-        const bookmark = await BookmarkModel.addBookmark(userId, videoId);
-        res.json({ message: 'Bookmark added successfully', bookmark });
-      } catch (dbError) {
-        console.error('Database error during bookmark add:', dbError);
-        
-        // Fallback: provide mock success response
-        const mockBookmark = { id: Math.floor(Math.random() * 1000) + 100 };
-        res.json({ message: 'Bookmark added successfully', bookmark: mockBookmark });
-      }
+      const bookmark = await BookmarkModel.addBookmark(userId, videoId);
+      res.json({ message: 'Bookmark added successfully', bookmark });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to add bookmark' });
@@ -71,16 +62,8 @@ const BookmarkController = {
     try {
       const { videoId } = req.params;
       const userId = req.user.userId || req.user.id;
-      
-      try {
-        await BookmarkModel.removeBookmark(userId, videoId);
-        res.json({ message: 'Bookmark removed successfully' });
-      } catch (dbError) {
-        console.error('Database error during bookmark removal:', dbError);
-        
-        // Fallback: provide mock success response
-        res.json({ message: 'Bookmark removed successfully' });
-      }
+      await BookmarkModel.removeBookmark(userId, videoId);
+      res.json({ message: 'Bookmark removed successfully' });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to remove bookmark' });
@@ -90,36 +73,8 @@ const BookmarkController = {
   async getUserBookmarks(req, res) {
     try {
       const userId = req.user.userId || req.user.id;
-      
-      try {
-        const bookmarks = await BookmarkModel.getBookmarksByUser(userId);
-        res.json(bookmarks);
-      } catch (dbError) {
-        console.error('Database error during bookmarks fetch:', dbError);
-        
-        // Fallback: provide mock bookmarks for testing
-        const mockBookmarks = [
-          {
-            id: 1,
-            title: "Introduction to React Hooks",
-            description: "Learn the basics of React Hooks",
-            category: "Technology",
-            video_url: "https://example.com/video1.mp4",
-            approved: true,
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 2,
-            title: "Advanced JavaScript Patterns",
-            description: "Master advanced JavaScript concepts",
-            category: "Programming",
-            video_url: "https://example.com/video2.mp4",
-            approved: true,
-            created_at: new Date().toISOString()
-          }
-        ];
-        res.json(mockBookmarks);
-      }
+      const bookmarks = await BookmarkModel.getBookmarksByUser(userId);
+      res.json(bookmarks);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to fetch bookmarks' });
@@ -130,36 +85,8 @@ const BookmarkController = {
   async list(req, res) {
     try {
       const userId = req.user.userId || req.user.id;
-      
-      try {
-        const bookmarks = await BookmarkModel.getBookmarksByUser(userId);
-        res.json(bookmarks);
-      } catch (dbError) {
-        console.error('Database error during bookmarks list:', dbError);
-        
-        // Fallback: provide mock bookmarks for testing
-        const mockBookmarks = [
-          {
-            id: 1,
-            title: "Introduction to React Hooks",
-            description: "Learn the basics of React Hooks",
-            category: "Technology",
-            video_url: "https://example.com/video1.mp4",
-            approved: true,
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 2,
-            title: "Advanced JavaScript Patterns",
-            description: "Master advanced JavaScript concepts",
-            category: "Programming",
-            video_url: "https://example.com/video2.mp4",
-            approved: true,
-            created_at: new Date().toISOString()
-          }
-        ];
-        res.json(mockBookmarks);
-      }
+      const bookmarks = await BookmarkModel.getBookmarksByUser(userId);
+      res.json(bookmarks);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to fetch bookmarks' });
@@ -170,17 +97,8 @@ const BookmarkController = {
     try {
       const { videoId } = req.body;
       const userId = req.user.userId || req.user.id;
-      
-      try {
-        const bookmark = await BookmarkModel.addBookmark(userId, videoId);
-        res.json({ message: 'Bookmark added successfully', bookmark });
-      } catch (dbError) {
-        console.error('Database error during bookmark add (legacy):', dbError);
-        
-        // Fallback: provide mock success response
-        const mockBookmark = { id: Math.floor(Math.random() * 1000) + 100 };
-        res.json({ message: 'Bookmark added successfully', bookmark: mockBookmark });
-      }
+      const bookmark = await BookmarkModel.addBookmark(userId, videoId);
+      res.json({ message: 'Bookmark added successfully', bookmark });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to add bookmark' });
@@ -191,16 +109,8 @@ const BookmarkController = {
     try {
       const { videoId } = req.params;
       const userId = req.user.userId || req.user.id;
-      
-      try {
-        await BookmarkModel.removeBookmark(userId, videoId);
-        res.json({ message: 'Bookmark removed successfully' });
-      } catch (dbError) {
-        console.error('Database error during bookmark removal (legacy):', dbError);
-        
-        // Fallback: provide mock success response
-        res.json({ message: 'Bookmark removed successfully' });
-      }
+      await BookmarkModel.removeBookmark(userId, videoId);
+      res.json({ message: 'Bookmark removed successfully' });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to remove bookmark' });

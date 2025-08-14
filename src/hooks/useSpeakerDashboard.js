@@ -14,12 +14,12 @@ export const useSpeakerDashboard = () => {
   const authHeaders = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
   const mapStats = (apiStats) => ({
-    total_videos: apiStats?.totalVideos ?? apiStats?.total_videos ?? 0,
-    approved_videos: apiStats?.approvedVideos ?? apiStats?.approved_videos ?? 0,
-    pending_videos: apiStats?.pendingVideos ?? apiStats?.pending_videos ?? 0,
-    total_views: apiStats?.totalViews ?? apiStats?.total_views ?? 0,
-    videos_this_week: apiStats?.videos_this_week ?? 0,
-    videos_this_month: apiStats?.videos_this_month ?? 0,
+    total_videos: Number(apiStats?.totalVideos ?? apiStats?.total_videos ?? 0),
+    approved_videos: Number(apiStats?.approvedVideos ?? apiStats?.approved_videos ?? 0),
+    pending_videos: Number(apiStats?.pendingVideos ?? apiStats?.pending_videos ?? 0),
+    total_views: Number(apiStats?.totalViews ?? apiStats?.total_views ?? 0),
+    videos_this_week: Number(apiStats?.videos_this_week ?? 0),
+    videos_this_month: Number(apiStats?.videos_this_month ?? 0),
   });
 
   const fetchDashboard = useCallback(async () => {

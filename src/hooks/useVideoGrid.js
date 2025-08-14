@@ -25,7 +25,19 @@ export const useVideoGrid = () => {
 
       const [videosRes, bookmarksRes] = await Promise.all([videosPromise, bookmarksPromise]);
 
-      setAllVideos(videosRes.data.filter((v) => v.approved));
+      // Normalize shapes and include both file uploads and external URLs
+      const normalized = (Array.isArray(videosRes.data) ? videosRes.data : [])
+        .map(v => ({
+          id: v.id,
+          title: v.title,
+          description: v.description,
+          category: v.category,
+          video_url: v.video_url || v.url,
+          approved: v.approved === true,
+          created_at: v.created_at
+        }))
+        .filter(v => v.approved);
+      setAllVideos(normalized);
       setBookmarkedIds(new Set(bookmarksRes.data.map((v) => v.id)));
     } catch (err) {
       console.error('Failed to fetch videos or bookmarks', err);
