@@ -12,21 +12,35 @@ const bookmarkRoutes = require('./routes/bookmarkRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-// CORS configuration
-const corsOptions = {
-    origin: [
-        'http://localhost:3000',
-        'https://mind-lift-sooty.vercel.app',
-        'https://mindlift-frontend.vercel.app',
-        'https://mindlift.space',
-        'https://www.mindlift.space'
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-};
+// CORS configuration (dynamic for Railway + Vercel)
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'https://mind-lift-sooty.vercel.app',
+  'https://mindlift-frontend.vercel.app',
+  'https://mindlift.space',
+  'https://www.mindlift.space'
+];
 
-app.use(cors(corsOptions));
+const envAllowedOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser tools
+    const isVercelPreview = /https:\/\/.+\.vercel\.app$/.test(origin);
+    if (allowedOrigins.includes(origin) || isVercelPreview) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS not allowed from origin: ' + origin), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
