@@ -11,7 +11,7 @@ export const useSpeakerDashboard = () => {
   const [error, setError] = useState('');
 
   const token = useMemo(() => localStorage.getItem('token'), []);
-  const authHeaders = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
+  const authHeaders = useMemo(() => token ? { Authorization: `Bearer ${token}` } : {}, [token]);
 
   const mapStats = (apiStats) => ({
     total_videos: Number(apiStats?.totalVideos ?? apiStats?.total_videos ?? 0),
