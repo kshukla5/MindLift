@@ -79,10 +79,17 @@ app.get('/', (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'healthy', 
+    res.json({
+        status: 'healthy',
         service: 'MindLift API',
-        timestamp: new Date().toISOString() 
+        version: '1.0.0',
+        timestamp: new Date().toISOString(),
+        environment: {
+            node_version: process.version,
+            platform: process.platform,
+            uptime: process.uptime(),
+            memory: process.memoryUsage()
+        }
     });
 });
 
