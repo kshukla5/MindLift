@@ -56,25 +56,51 @@ const VideoController = {
     try {
       const { title, description, category, url, videoUrl } = req.body;
       const userId = req.user.id;
+      const userRole = req.user.role;
+
+      console.log('Video creation request:', {
+        userId,
+        userRole,
+        title,
+        hasFile: !!req.file,
+        hasUrl: !!(videoUrl || url)
+      });
+
+      // Ensure user has speaker role
+      if (userRole !== 'speaker') {
+        return res.status(403).json({ error: 'Only speakers can upload videos' });
+      }
 
       let finalVideoUrl;
       if (req.file) {
         finalVideoUrl = `/uploads/${req.file.filename}`;
+        console.log('Using uploaded file:', finalVideoUrl);
       } else if (videoUrl || url) {
         finalVideoUrl = videoUrl || url;
+        console.log('Using URL:', finalVideoUrl);
       } else {
         return res.status(400).json({ error: 'Video file or URL is required' });
       }
+
       if (!title || !description || !category) {
         return res.status(400).json({ error: 'Title, description, and category are required' });
       }
 
       // Resolve or create speaker row for this user
+      console.log('Looking up/creating speaker profile for user:', userId);
       let speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
       if (!speakerId) {
+        console.log('No speaker profile found, creating one...');
         speakerId = await SpeakerModel.ensureSpeakerRow(userId);
+        console.log('Created speaker profile with ID:', speakerId);
       }
 
+      if (!speakerId) {
+        console.error('Failed to create/find speaker profile for user:', userId);
+        return res.status(500).json({ error: 'Failed to create speaker profile' });
+      }
+
+      console.log('Creating video with speaker ID:', speakerId);
       const video = await VideoModel.createVideo({
         title,
         description,
@@ -83,10 +109,11 @@ const VideoController = {
         speakerId,
       });
 
+      console.log('Video created successfully:', video.id, video.title);
       res.status(201).json(video);
     } catch (err) {
-      console.error('Video upload error:', err);
-      res.status(500).json({ error: 'Failed to upload video' });
+      console.error('Video upload error:', err.message, err.stack);
+      res.status(500).json({ error: 'Failed to upload video', details: err.message });
     }
   },
 

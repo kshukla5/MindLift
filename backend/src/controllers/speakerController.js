@@ -12,23 +12,42 @@ const SpeakerController = {
     }
   },
 
-  async getDashboard(req, res) {
+    async getDashboard(req, res) {
     try {
-      console.log('getDashboard called for user:', req.user.id, req.user.email);
+      console.log('getDashboard called for user:', req.user.id, req.user.email, req.user.role);
       const userId = req.user.id;
+
+      // Ensure user has speaker role before proceeding
+      if (req.user.role !== 'speaker') {
+        return res.status(403).json({
+          error: 'Access denied. Speaker role required.',
+          speaker: null,
+          stats: { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0, videos_this_week: 0, videos_this_month: 0 },
+          recentVideos: [],
+        });
+      }
 
       let speakerId = null;
       try {
         speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
         if (!speakerId) {
-          console.log('No speaker profile found, creating one...');
+          console.log('No speaker profile found, creating one for user:', userId);
           speakerId = await SpeakerModel.ensureSpeakerRow(userId);
+          console.log('Created speaker profile with ID:', speakerId);
         }
       } catch (e) {
-        console.warn('Speaker profile lookup/creation failed, continuing with safe defaults:', e.message);
+        console.error('Speaker profile lookup/creation failed:', e.message);
+        return res.status(500).json({
+          error: 'Failed to create speaker profile. Please try again.',
+          speaker: null,
+          stats: { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0, videos_this_week: 0, videos_this_month: 0 },
+          recentVideos: [],
+        });
       }
 
-      let stats = { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0 };
+      console.log('Using speaker ID:', speakerId, 'for user:', userId);
+
+      let stats = { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0, videos_this_week: 0, videos_this_month: 0 };
       let recent = [];
       if (speakerId) {
         try {
@@ -36,15 +55,22 @@ const SpeakerController = {
             SpeakerModel.getSpeakerStats(speakerId),
             SpeakerModel.getRecentForSpeaker(speakerId, 5),
           ]);
+
+          console.log('Raw stats from DB:', statsRow);
+          console.log('Recent videos from DB:', recentRows?.length || 0, 'videos');
+
           stats = {
             totalVideos: Number(statsRow?.total_videos || 0),
             approvedVideos: Number(statsRow?.approved_videos || 0),
             pendingVideos: Number(statsRow?.pending_videos || 0),
             totalViews: 0,
+            videos_this_week: Number(statsRow?.videos_this_week || 0),
+            videos_this_month: Number(statsRow?.videos_this_month || 0),
           };
           recent = recentRows || [];
         } catch (e) {
-          console.warn('Stats/recent fetch failed, returning safe defaults:', e.message);
+          console.error('Stats/recent fetch failed:', e.message, e.stack);
+          // Continue with safe defaults
         }
       }
 
@@ -53,13 +79,20 @@ const SpeakerController = {
         stats,
         recentVideos: recent,
       };
+
+      console.log('Sending dashboard response:', {
+        speaker: response.speaker,
+        stats: response.stats,
+        recentCount: response.recentVideos.length
+      });
+
       res.json(response);
     } catch (err) {
-      console.error('Speaker dashboard error (outer):', err);
-      // Never fail hard; return safe defaults so UI loads
-      res.json({
-        speaker: { id: null, email: req.user.email, role: req.user.role },
-        stats: { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0 },
+      console.error('Speaker dashboard error (outer):', err.message, err.stack);
+      res.status(500).json({
+        error: 'Failed to load dashboard data',
+        speaker: null,
+        stats: { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0, videos_this_week: 0, videos_this_month: 0 },
         recentVideos: [],
       });
     }
@@ -115,6 +148,50 @@ const SpeakerController = {
       res.status(500).json({ error: 'Failed to delete speaker' });
     }
   },
+
+  // Debug endpoint for troubleshooting
+  async debugSpeakerData(req, res) {
+    try {
+      const userId = req.user.id;
+      const userRole = req.user.role;
+      const userEmail = req.user.email;
+
+      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
+      const speakerProfile = speakerId ? await SpeakerModel.getSpeakerById(speakerId) : null;
+
+      let stats = null;
+      let videos = [];
+      let recentVideos = [];
+
+      if (speakerId) {
+        stats = await SpeakerModel.getSpeakerStats(speakerId);
+        videos = await SpeakerModel.getRecentForSpeaker(speakerId, 10);
+        recentVideos = videos;
+      }
+
+      res.json({
+        debug: {
+          userId,
+          userRole,
+          userEmail,
+          speakerId,
+          hasSpeakerProfile: !!speakerProfile,
+          speakerProfile,
+          stats,
+          videoCount: videos.length,
+          recentVideos: recentVideos.map(v => ({
+            id: v.id,
+            title: v.title,
+            approved: v.approved,
+            created_at: v.created_at
+          }))
+        }
+      });
+    } catch (err) {
+      console.error('Debug endpoint error:', err);
+      res.status(500).json({ error: err.message, stack: err.stack });
+    }
+  }
 };
 
 module.exports = SpeakerController;
