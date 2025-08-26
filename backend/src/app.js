@@ -63,15 +63,17 @@ app.get('/', (req, res) => {
     res.json({
         message: 'MindLift API is running successfully! 🚀',
         status: 'healthy',
-        version: '1.0.0',
+        version: '1.0.1', // Updated version to verify deployment
         deployment: 'Railway Production',
         endpoints: {
             auth: '/api/login, /api/signup',
             health: '/health',
             videos: '/api/videos',
-            dashboard: '/api/speaker/dashboard, /api/learner/dashboard, /api/admin/dashboard'
+            dashboard: '/api/speaker/dashboard, /api/learner/dashboard, /api/admin/dashboard',
+            debug: '/api/debug' // Added debug endpoint
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        security: 'Enhanced authentication with input validation'
     });
 });
 

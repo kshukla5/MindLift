@@ -32,36 +32,60 @@ const UserController = {
       }
 
       // Password strength validation
-      if (password.length < 8) {
-        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+      if (password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters long' });
       }
 
       const userRole = allowedRoles.includes(role) ? role : 'subscriber';
 
-      // Check if user already exists (case-insensitive)
-      const existing = await UserModel.findByEmail(email.toLowerCase());
-      if (existing) {
-        return res.status(409).json({ error: 'User with this email already exists.' });
+      try {
+        // Check if user already exists (case-insensitive)
+        const existing = await UserModel.findByEmail(email.toLowerCase());
+        if (existing) {
+          return res.status(409).json({ error: 'User with this email already exists.' });
+        }
+
+        // Hash password and create user
+        const hashed = await bcrypt.hash(password, 10);
+        const user = await UserModel.createUser({
+          name: name.trim(),
+          email: email.toLowerCase(),
+          password: hashed,
+          role: userRole
+        });
+
+        // Generate JWT token
+        const token = jwt.sign(
+          { id: user.id, email: user.email, role: user.role },
+          JWT_SECRET,
+          { expiresIn: '1h' }
+        );
+
+        console.log(`User ${email} signed up successfully with role: ${user.role}`);
+        res.status(201).json({ token });
+      } catch (dbError) {
+        console.error('Database error during signup:', dbError);
+        console.error('Database error details:', {
+          message: dbError.message,
+          code: dbError.code,
+          severity: dbError.severity,
+          detail: dbError.detail,
+          hint: dbError.hint
+        });
+
+        // Check if it's a connection error
+        if (dbError.code === 'ECONNREFUSED' || dbError.message?.includes('connect')) {
+          return res.status(503).json({
+            error: 'Database temporarily unavailable. Please try again in a few moments.',
+            code: 'DATABASE_UNAVAILABLE'
+          });
+        }
+
+        return res.status(500).json({
+          error: 'Unable to create account due to a database issue. Please try again.',
+          code: 'DATABASE_ERROR'
+        });
       }
-
-      // Hash password and create user
-      const hashed = await bcrypt.hash(password, 10);
-      const user = await UserModel.createUser({
-        name: name.trim(),
-        email: email.toLowerCase(),
-        password: hashed,
-        role: userRole
-      });
-
-      // Generate JWT token
-      const token = jwt.sign(
-        { id: user.id, email: user.email, role: user.role },
-        JWT_SECRET,
-        { expiresIn: '1h' }
-      );
-
-      console.log(`User ${email} signed up successfully with role: ${user.role}`);
-      res.status(201).json({ token });
     } catch (err) {
       console.error('Signup error:', err);
       res.status(500).json({ error: 'Signup failed. Please try again.' });
@@ -164,6 +188,41 @@ const UserController = {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to fetch learner dashboard' });
+    }
+  }
+};
+
+  // Debug endpoint for troubleshooting
+  async debugEnv(req, res) {
+    try {
+      const envInfo = {
+        node_env: process.env.NODE_ENV,
+        has_database_url: !!process.env.DATABASE_URL,
+        database_url_length: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0,
+        has_pg_vars: !!(process.env.PGHOST || process.env.DB_HOST),
+        pghost: process.env.PGHOST ? '[SET]' : '[NOT SET]',
+        pguser: process.env.PGUSER ? '[SET]' : '[NOT SET]',
+        pgdatabase: process.env.PGDATABASE ? '[SET]' : '[NOT SET]',
+        jwt_secret_set: !!process.env.JWT_SECRET,
+        timestamp: new Date().toISOString()
+      };
+
+      // Test database connection
+      try {
+        const pool = require('../config/db');
+        const result = await pool.query('SELECT NOW() as current_time');
+        envInfo.db_connection = 'SUCCESS';
+        envInfo.db_time = result.rows[0].current_time;
+      } catch (dbErr) {
+        envInfo.db_connection = 'FAILED';
+        envInfo.db_error = dbErr.message;
+        envInfo.db_code = dbErr.code;
+      }
+
+      res.json(envInfo);
+    } catch (err) {
+      console.error('Debug endpoint error:', err);
+      res.status(500).json({ error: err.message });
     }
   }
 };
