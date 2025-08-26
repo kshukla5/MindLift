@@ -114,20 +114,32 @@ app.get('/health/db', async (req, res) => {
     }
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-that-matches-the-one-in-app.js';
+// Initialize JWT secret
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ JWT_SECRET environment variable is not set!');
+  console.error('Please set JWT_SECRET in your Railway environment variables');
+}
 
-// This is a mock user database. In a real application, you would query a database.
-const users = [
-    { id: 1, email: 'test@example.com', password: 'password123', role: 'user' },
-    { id: 2, email: 'admin@example.com', password: 'adminpassword', role: 'admin' },
-    { id: 3, email: 'speaker@example.com', password: 'speakerpass', role: 'speaker' }
-];
-
+// API Routes
 app.use('/api', adminRoutes);
 app.use('/api', speakerRoutes);
 app.use('/api', bookmarkRoutes);
 app.use('/api', videoRoutes);
 app.use('/api', userRoutes);
 
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 module.exports = app;
-// Route fix Mon Aug 11 16:55:37 EDT 2025

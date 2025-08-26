@@ -3,7 +3,14 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 
 const allowedRoles = ['speaker', 'subscriber', 'admin'];
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-that-matches-the-one-in-app.js';
+
+function getJWTSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is not set');
+  }
+  return secret;
+}
 
 const UserController = {
   async list(req, res) {
@@ -54,15 +61,15 @@ const UserController = {
           role: userRole
         });
 
-        // Generate JWT token
-        const token = jwt.sign(
-          { id: user.id, email: user.email, role: user.role },
-          JWT_SECRET,
-          { expiresIn: '1h' }
-        );
+              // Generate JWT token
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        getJWTSecret(),
+        { expiresIn: '1h' }
+      );
 
-        console.log(`User ${email} signed up successfully with role: ${user.role}`);
-        res.status(201).json({ token });
+      console.log(`User ${email} signed up successfully with role: ${user.role}`);
+      res.status(201).json({ token });
       } catch (dbError) {
         console.error('Database error during signup:', dbError);
         console.error('Database error details:', {
@@ -124,7 +131,7 @@ const UserController = {
       // Generate JWT token
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
-        JWT_SECRET,
+        getJWTSecret(),
         { expiresIn: '1h' }
       );
 
