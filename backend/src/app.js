@@ -12,21 +12,35 @@ const bookmarkRoutes = require('./routes/bookmarkRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-// CORS configuration
-const corsOptions = {
-    origin: [
-        'http://localhost:3000',
-        'https://mind-lift-sooty.vercel.app',
-        'https://mindlift-frontend.vercel.app',
-        'https://mindlift.space',
-        'https://www.mindlift.space'
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
-};
+// CORS configuration (dynamic for Railway + Vercel)
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'https://mind-lift-sooty.vercel.app',
+  'https://mindlift-frontend.vercel.app',
+  'https://mindlift.space',
+  'https://www.mindlift.space'
+];
 
-app.use(cors(corsOptions));
+const envAllowedOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser tools
+    const isVercelPreview = /https:\/\/.+\.vercel\.app$/.test(origin);
+    if (allowedOrigins.includes(origin) || isVercelPreview) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS not allowed from origin: ' + origin), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
@@ -49,24 +63,33 @@ app.get('/', (req, res) => {
     res.json({
         message: 'MindLift API is running successfully! 🚀',
         status: 'healthy',
-        version: '1.0.0',
+        version: '1.0.1', // Updated version to verify deployment
         deployment: 'Railway Production',
         endpoints: {
             auth: '/api/login, /api/signup',
             health: '/health',
             videos: '/api/videos',
-            dashboard: '/api/speaker/dashboard, /api/learner/dashboard, /api/admin/dashboard'
+            dashboard: '/api/speaker/dashboard, /api/learner/dashboard, /api/admin/dashboard',
+            debug: '/api/debug' // Added debug endpoint
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        security: 'Enhanced authentication with input validation'
     });
 });
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'healthy', 
+    res.json({
+        status: 'healthy',
         service: 'MindLift API',
-        timestamp: new Date().toISOString() 
+        version: '1.0.0',
+        timestamp: new Date().toISOString(),
+        environment: {
+            node_version: process.version,
+            platform: process.platform,
+            uptime: process.uptime(),
+            memory: process.memoryUsage()
+        }
     });
 });
 
@@ -98,20 +121,32 @@ app.get('/health/db', async (req, res) => {
     }
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-that-matches-the-one-in-app.js';
+// Initialize JWT secret
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ JWT_SECRET environment variable is not set!');
+  console.error('Please set JWT_SECRET in your Railway environment variables');
+}
 
-// This is a mock user database. In a real application, you would query a database.
-const users = [
-    { id: 1, email: 'test@example.com', password: 'password123', role: 'user' },
-    { id: 2, email: 'admin@example.com', password: 'adminpassword', role: 'admin' },
-    { id: 3, email: 'speaker@example.com', password: 'speakerpass', role: 'speaker' }
-];
-
+// API Routes
 app.use('/api', adminRoutes);
 app.use('/api', speakerRoutes);
 app.use('/api', bookmarkRoutes);
 app.use('/api', videoRoutes);
 app.use('/api', userRoutes);
 
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 module.exports = app;
-// Route fix Mon Aug 11 16:55:37 EDT 2025

@@ -1,280 +1,172 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './AuthForm.css';
-import { connectSocket } from '../services/socket';
-import API_URL from '../api';
+import { useAuth } from '../hooks/useAuth';
+import './Auth.css';
 
-function Signup() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('subscriber');
+const Signup = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const checkPasswordStrength = (password) => {
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[a-z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
-    setPasswordStrength(strength);
-  };
-
-  const getPasswordStrengthText = () => {
-    switch (passwordStrength) {
-      case 0:
-      case 1: return { text: 'Weak', color: '#ef4444' };
-      case 2: return { text: 'Fair', color: '#f97316' };
-      case 3: return { text: 'Good', color: '#eab308' };
-      case 4:
-      case 5: return { text: 'Strong', color: '#22c55e' };
-      default: return { text: '', color: '' };
-    }
-  };
-
-  const handlePasswordChange = (e) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    checkPasswordStrength(newPassword);
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError('');
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+
+    // Basic validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
       return;
     }
-    if (passwordStrength < 2) {
-      setError('Please choose a stronger password.');
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
       return;
     }
-    setIsLoading(true);
+
     try {
-      const res = await fetch(`${API_URL}/api/signup`, {
+      // In a real app, this would be an API call
+      const response = await fetch('/api/signup', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        }),
       });
 
-      if (!res.ok) {
-        let errorMessage = `Signup failed with status: ${res.status}`;
-        const contentType = res.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const errorData = await res.json();
-          errorMessage = errorData.error || errorMessage;
-        } else {
-          console.error("Received a non-JSON response from the server. This is often a proxy issue.");
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await res.json();
-      localStorage.setItem('token', data.token);
-      connectSocket(data.token);
-
-      // Role-based redirection on signup
-      if (role === 'speaker') {
-        navigate('/speaker');
-      } else {
+      if (response.ok) {
+        const data = await response.json();
+        login(data.user, data.token);
         navigate('/dashboard');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Signup failed');
       }
-      window.location.reload(); // To ensure all components re-render with new auth state
     } catch (err) {
-      setError(err.message);
+      setError('Network error. Please try again.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const strengthIndicator = getPasswordStrengthText();
-
   return (
-    <div className="auth-wrapper">
-      <div className="registration-container">
-        {/* Left Panel - Branding */}
-        <div className="brand-panel">
-          <div className="brand-content">
-            <div className="brand-logo">
-              <span className="logo-icon">🧠</span>
-              <h1>MindLift</h1>
-            </div>
-            <p className="brand-tagline">Transform your mindset. Elevate your life.</p>
-            <div className="features-list">
-              <div className="feature-item">
-                <span className="feature-icon">✨</span>
-                <span>Expert-led content</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">🎯</span>
-                <span>Personalized journey</span>
-              </div>
-              <div className="feature-item">
-                <span className="feature-icon">🚀</span>
-                <span>Proven results</span>
-              </div>
-            </div>
+    <div className="auth-page">
+      <div className="auth-container">
+        <div className="auth-card card">
+          <div className="auth-header">
+            <h1>Join MindLift</h1>
+            <p>Create your account and start your learning journey</p>
           </div>
-        </div>
 
-        {/* Right Panel - Registration Form */}
-        <div className="form-panel">
-          <div className="form-container">
-            <div className="form-header">
-              <h2>Create Account</h2>
-              <p>Join thousands transforming their lives</p>
-            </div>
-
+          <form onSubmit={handleSubmit} className="auth-form">
             {error && (
-              <div className="error-alert">
-                <span className="alert-icon">⚠️</span>
+              <div className="error-message">
                 {error}
               </div>
             )}
 
-            <form className="registration-form" onSubmit={handleSubmit}>
-              {/* Name & Email Row */}
-              <div className="form-row">
-                <div className="form-field">
-                  <label htmlFor="name">Full Name</label>
-                  <input
-                    id="name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="email">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="john@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
+            <div className="form-group">
+              <label htmlFor="name" className="form-label">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="form-input"
+                required
+              />
+            </div>
 
-              {/* Role Selection */}
-              <div className="form-field">
-                <label>Join as</label>
-                <div className="role-tabs">
-                  <button
-                    type="button"
-                    className={`role-tab ${role === 'subscriber' ? 'active' : ''}`}
-                    onClick={() => setRole('subscriber')}
-                    disabled={isLoading}
-                  >
-                    <span className="role-icon">🎧</span>
-                    Learner
-                  </button>
-                  <button
-                    type="button"
-                    className={`role-tab ${role === 'speaker' ? 'active' : ''}`}
-                    onClick={() => setRole('speaker')}
-                    disabled={isLoading}
-                  >
-                    <span className="role-icon">🎤</span>
-                    Speaker
-                  </button>
-                </div>
-              </div>
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="form-input"
+                required
+              />
+            </div>
 
-              {/* Password Row */}
-              <div className="form-row">
-                <div className="form-field">
-                  <label htmlFor="password">Password</label>
-                  <div className="password-input">
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Create password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                      required
-                      disabled={isLoading}
-                    />
-                    <button
-                      type="button"
-                      className="toggle-password"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={isLoading}
-                    >
-                      {showPassword ? '👁️' : '👁️‍🗨️'}
-                    </button>
-                  </div>
-                  {password && (
-                    <div className="strength-indicator">
-                      <div 
-                        className="strength-bar"
-                        style={{
-                          width: `${(passwordStrength / 5) * 100}%`,
-                          backgroundColor: strengthIndicator.color
-                        }}
-                      ></div>
-                      <span className="strength-text" style={{ color: strengthIndicator.color }}>
-                        {strengthIndicator.text}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="form-field">
-                  <label htmlFor="confirmPassword">Confirm</label>
-                  <div className="password-input">
-                    <input
-                      id="confirmPassword"
-                      type="password"
-                      placeholder="Repeat password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                    {confirmPassword && (
-                      <span className={`match-icon ${password === confirmPassword ? 'match' : 'no-match'}`}>
-                        {password === confirmPassword ? '✅' : '❌'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="form-input"
+                required
+                minLength="6"
+              />
+            </div>
 
-              <button type="submit" className="create-btn" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <div className="spinner"></div>
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    Create Account
-                    <span className="btn-arrow">→</span>
-                  </>
-                )}
-              </button>
+            <div className="form-group">
+              <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="form-input"
+                required
+                minLength="6"
+              />
+            </div>
 
-              <div className="form-footer">
-                <p>Already have an account? <Link to="/login" className="login-link">Sign in</Link></p>
-                <p className="terms">By signing up, you agree to our <a href="/terms">Terms</a> & <a href="/privacy">Privacy Policy</a></p>
-              </div>
-            </form>
+            <button
+              type="submit"
+              className="btn btn-primary auth-submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Creating Account...
+                </>
+              ) : (
+                'Create Account'
+              )}
+            </button>
+          </form>
+
+          <div className="auth-footer">
+            <p>
+              Already have an account?{' '}
+              <Link to="/login" className="auth-link">
+                Sign in here
+              </Link>
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Signup;

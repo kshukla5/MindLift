@@ -1,36 +1,72 @@
-import { useMemo } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 
-const decodeToken = (token) => {
-  try {
-    // Basic check for JWT structure
-    if (token.split('.').length !== 3) return null;
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch (e) {
-    console.error('Failed to decode token:', e);
-    return null;
-  }
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check for existing token on app load
+    const token = localStorage.getItem('token');
+    if (token) {
+      // In a real app, you'd verify the token with your backend
+      try {
+        // Decode token (simplified - in real app use jwt-decode library)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setUser({
+          id: payload.id,
+          email: payload.email,
+          name: payload.name || payload.email,
+          role: payload.role || 'learner'
+        });
+        setIsAuthenticated(true);
+      } catch (error) {
+        localStorage.removeItem('token');
+      }
+    }
+    setLoading(false);
+  }, []);
+
+  const login = (userData, token) => {
+    localStorage.setItem('token', token);
+    setUser(userData);
+    setIsAuthenticated(true);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
+  const value = {
+    isAuthenticated,
+    user,
+    loading,
+    login,
+    logout
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-/**
- * A hook to get authentication status and user info from the JWT in localStorage.
- * It uses useMemo to avoid re-calculating on every render.
- */
 export const useAuth = () => {
-  const token = localStorage.getItem('token');
-
-  return useMemo(() => {
-    if (!token) {
-      return { token: null, user: null, isAuthenticated: false, isAdmin: false, isSpeaker: false };
-    }
-
-    const user = decodeToken(token);
-
-    if (!user) {
-      return { token: null, user: null, isAuthenticated: false, isAdmin: false, isSpeaker: false };
-    }
-
+  const context = useContext(AuthContext);
+  if (!context) {
+    // Return default values if not wrapped in AuthProvider
     return {
-      token, user, isAuthenticated: true, isAdmin: user.role === 'admin', isSpeaker: user.role === 'speaker',
+      isAuthenticated: false,
+      user: null,
+      loading: false,
+      login: () => {},
+      logout: () => {}
     };
-  }, [token]);
+  }
+  return context;
 };

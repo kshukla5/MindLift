@@ -43,17 +43,19 @@ const SpeakerModel = {
 
   async getSpeakerStats(speakerId) {
     const result = await pool.query(
-      `SELECT 
+      `SELECT
         COUNT(v.id) as total_videos,
         COUNT(CASE WHEN v.approved = true THEN 1 END) as approved_videos,
-        COUNT(CASE WHEN v.approved = false THEN 1 END) as pending_videos
+        COUNT(CASE WHEN v.approved = false THEN 1 END) as pending_videos,
+        COUNT(CASE WHEN v.created_at >= NOW() - INTERVAL '7 days' THEN 1 END) as videos_this_week,
+        COUNT(CASE WHEN v.created_at >= NOW() - INTERVAL '30 days' THEN 1 END) as videos_this_month
        FROM speakers s
-       LEFT JOIN videos v ON s.id = v.speaker_id  
+       LEFT JOIN videos v ON s.id = v.speaker_id
        WHERE s.id = $1
        GROUP BY s.id`,
       [speakerId]
     );
-    return result.rows[0] || { total_videos: 0, approved_videos: 0, pending_videos: 0 };
+    return result.rows[0] || { total_videos: 0, approved_videos: 0, pending_videos: 0, videos_this_week: 0, videos_this_month: 0 };
   },
 
   async getRecentForSpeaker(speakerId, limit = 5) {

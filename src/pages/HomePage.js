@@ -1,273 +1,268 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './HomePage.css';
 
-// Component for statistics display
-function StatCard({ value, label, icon }) {
-  return (
-    <div className="stat-card">
-      <div className="stat-icon">{icon}</div>
-      <div className="stat-value">{value}</div>
-      <div className="stat-label">{label}</div>
-    </div>
-  );
-}
-
-// Component for feature cards
-function FeatureCard({ icon, title, description }) {
-  return (
-    <div className="feature-card">
-      <div className="feature-icon">{icon}</div>
-      <h3 className="feature-title">{title}</h3>
-      <p className="feature-description">{description}</p>
-    </div>
-  );
-}
-
-// Component for steps
-function StepCard({ number, title, description }) {
-  return (
-    <div className="step-card">
-      <div className="step-number">{number}</div>
-      <h3 className="step-title">{title}</h3>
-      <p className="step-description">{description}</p>
-    </div>
-  );
-}
-
-// Component for testimonials
-function TestimonialCard({ quote, author, role }) {
-  return (
-    <div className="testimonial-card">
-      <div className="testimonial-quote">"{quote}"</div>
-      <div className="testimonial-author">
-        <div className="author-name">{author}</div>
-        <div className="author-role">{role}</div>
-      </div>
-    </div>
-  );
-}
-
-function HomePage() {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+const HomePage = () => {
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    document.title = 'MindLift - Elevate Your Potential';
+    setIsVisible(true);
+
+    // Auto-rotate testimonials
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const stats = [
-    { icon: '👥', value: '12,000+', label: 'Active Learners' },
-    { icon: '🎥', value: '1,800+', label: 'Curated Videos' },
-    { icon: '⭐', value: '4.9/5', label: 'User Rating' },
-    { icon: '🚀', value: '96%', label: 'Return Rate' }
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Software Developer",
+      content: "MindLift transformed my career. The expert-led content and personalized learning path helped me master React in just 3 months.",
+      avatar: "SJ"
+    },
+    {
+      name: "Michael Chen",
+      role: "Product Manager",
+      content: "The quality of speakers and depth of content is unmatched. Every video provides real value and practical insights.",
+      avatar: "MC"
+    },
+    {
+      name: "Emily Rodriguez",
+      role: "UX Designer",
+      content: "I love how MindLift combines theory with practical applications. The community aspect makes learning so much more engaging.",
+      avatar: "ER"
+    }
   ];
 
   const features = [
     {
-      icon: '🎯',
-      title: 'Curated Content',
-      description: 'Hand-picked videos from industry experts and thought leaders'
+      icon: "🎓",
+      title: "Expert-Led Learning",
+      description: "Learn from industry leaders and subject matter experts with decades of real-world experience."
     },
     {
-      icon: '🧠',
-      title: 'Science-Based',
-      description: 'Content backed by neuroscience and behavioral psychology research'
+      icon: "📱",
+      title: "Flexible Learning",
+      description: "Access content anytime, anywhere. Our mobile-responsive platform works perfectly on all devices."
     },
     {
-      icon: '📚',
-      title: 'Personal Library',
-      description: 'Build your collection with bookmarks and personalized recommendations'
+      icon: "🎯",
+      title: "Personalized Paths",
+      description: "Get customized learning recommendations based on your goals, experience level, and interests."
     },
     {
-      icon: '📈',
-      title: 'Track Progress',
-      description: 'Monitor your learning journey with detailed analytics and insights'
+      icon: "💬",
+      title: "Community Support",
+      description: "Connect with fellow learners, share insights, and get help from our supportive community."
+    },
+    {
+      icon: "📊",
+      title: "Progress Tracking",
+      description: "Monitor your learning journey with detailed analytics and achievement milestones."
+    },
+    {
+      icon: "🏆",
+      title: "Skill Validation",
+      description: "Earn certificates and badges to showcase your newly acquired skills to employers."
     }
   ];
 
-  const steps = [
-    {
-      number: '01',
-      title: 'Create Account',
-      description: 'Sign up in seconds - completely free, no credit card required'
-    },
-    {
-      number: '02',
-      title: 'Choose Topics',
-      description: 'Select areas of interest to personalize your learning experience'
-    },
-    {
-      number: '03',
-      title: 'Start Learning',
-      description: 'Dive into curated content and build your knowledge foundation'
-    }
-  ];
-
-  const testimonials = [
-    {
-      quote: 'MindLift transformed how I approach personal development. The content quality is exceptional.',
-      author: 'Sarah Chen',
-      role: 'Product Manager'
-    },
-    {
-      quote: 'Finally, a platform that respects my time. Every video adds real value to my growth.',
-      author: 'Marcus Rodriguez',
-      role: 'Entrepreneur'
-    },
-    {
-      quote: 'The curation is spot-on. I discover insights I would never have found on my own.',
-      author: 'Dr. Emily Watson',
-      role: 'Research Scientist'
-    }
+  const stats = [
+    { number: "50K+", label: "Active Learners" },
+    { number: "1000+", label: "Expert Speakers" },
+    { number: "5000+", label: "Video Courses" },
+    { number: "95%", label: "Completion Rate" }
   ];
 
   return (
-    <div className="homepage">
+    <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section">
-        <div className="hero-container">
+        <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title">
-              Elevate Your <span className="text-gradient">Potential</span>
-            </h1>
-            <p className="hero-subtitle">
-              Discover curated video content designed to accelerate your personal and professional growth. 
-              Learn from experts, build better habits, and unlock your full potential.
-            </p>
-            <div className="hero-actions">
-              <button 
-                className="btn btn-primary btn-large"
-                onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
-              >
-                {isAuthenticated ? 'Go to Dashboard' : 'Start Learning Free'}
-              </button>
-              <button 
-                className="btn btn-outline btn-large"
-                onClick={() => navigate('/features')}
-              >
-                Explore Features
-              </button>
-            </div>
-            <div className="hero-badges">
-              <span className="badge">✓ Free Forever</span>
-              <span className="badge">✓ No Ads</span>
-              <span className="badge">✓ Expert Curated</span>
-            </div>
-          </div>
-          <div className="hero-visual">
-            <div className="hero-card">
-              <div className="card-header">
-                <div className="card-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-                <span className="card-title">🧠 MindLift</span>
+            <div className={`hero-text ${isVisible ? 'fade-in-up' : ''}`}>
+              <h1>Transform Your Mind,<br />Elevate Your Life</h1>
+              <p className="hero-subtitle">
+                Unlock your potential with expert-led courses, personalized learning paths,
+                and a supportive community that believes in your growth.
+              </p>
+              <div className="hero-actions">
+                <Link to="/signup" className="btn btn-primary">
+                  Start Learning Today
+                  <span>→</span>
+                </Link>
+                <Link to="/videos" className="btn btn-outline">
+                  Explore Courses
+                </Link>
               </div>
-              <div className="card-content">
-                <div className="video-preview">
-                  <div className="play-button">▶</div>
-                </div>
-                <div className="card-info">
-                  <h4>Growth Mindset Fundamentals</h4>
-                  <p>Dr. Carol Dweck • 12 min</p>
-                </div>
+              <div className="hero-stats">
+                {stats.map((stat, index) => (
+                  <div key={index} className="stat-item">
+                    <span className="stat-number">{stat.number}</span>
+                    <span className="stat-label">{stat.label}</span>
+                  </div>
+                ))}
               </div>
             </div>
+            <div className={`hero-visual ${isVisible ? 'fade-in-up' : ''}`}>
+              <div className="hero-illustration">
+                <div className="floating-card card-1">
+                  <span className="card-icon">🚀</span>
+                  <span className="card-text">Career Growth</span>
+                </div>
+                <div className="floating-card card-2">
+                  <span className="card-icon">💡</span>
+                  <span className="card-text">Innovation</span>
+                </div>
+                <div className="floating-card card-3">
+                  <span className="card-icon">🎯</span>
+                  <span className="card-text">Skill Mastery</span>
+                </div>
+                <div className="hero-center">
+                  <div className="hero-circle">
+                    <span className="hero-brain">🧠</span>
+                  </div>
+                  <h3>MindLift</h3>
+                  <p>Transformative Learning</p>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="stats-section">
-        <div className="stats-container">
-          {stats.map((stat, index) => (
-            <StatCard key={index} {...stat} />
-          ))}
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="features-section">
-        <div className="section-container">
-          <div className="section-header">
-            <h2 className="section-title">Why Choose MindLift?</h2>
-            <p className="section-subtitle">
-              We've reimagined online learning to focus on quality, relevance, and real-world application
-            </p>
+      <section className="features-section section">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2>Why Choose MindLift?</h2>
+            <p>Discover the features that make learning with us extraordinary</p>
           </div>
-          <div className="features-grid">
+          <div className="grid grid-3 features-grid">
             {features.map((feature, index) => (
-              <FeatureCard key={index} {...feature} />
+              <div key={index} className="feature-card card">
+                <div className="feature-icon">{feature.icon}</div>
+                <h3>{feature.title}</h3>
+                <p>{feature.description}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="steps-section">
-        <div className="section-container">
-          <div className="section-header">
-            <h2 className="section-title">Getting Started is Simple</h2>
-            <p className="section-subtitle">
-              Begin your learning journey in just three easy steps
-            </p>
+      <section className="how-it-works-section section">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2>How MindLift Works</h2>
+            <p>Your journey to mastery in three simple steps</p>
           </div>
-          <div className="steps-grid">
-            {steps.map((step, index) => (
-              <StepCard key={index} {...step} />
-            ))}
+          <div className="steps-container">
+            <div className="step-item">
+              <div className="step-number">01</div>
+              <h3>Choose Your Path</h3>
+              <p>Select from thousands of expert-led courses tailored to your career goals and interests.</p>
+            </div>
+            <div className="step-arrow">→</div>
+            <div className="step-item">
+              <div className="step-number">02</div>
+              <h3>Learn at Your Pace</h3>
+              <p>Access content anytime, anywhere with our mobile-responsive platform and flexible scheduling.</p>
+            </div>
+            <div className="step-arrow">→</div>
+            <div className="step-item">
+              <div className="step-number">03</div>
+              <h3>Achieve Mastery</h3>
+              <p>Apply your knowledge, earn certificates, and showcase your skills to advance your career.</p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="testimonials-section">
-        <div className="section-container">
-          <div className="section-header">
-            <h2 className="section-title">What Our Users Say</h2>
-            <p className="section-subtitle">
-              Join thousands of learners who are transforming their lives with MindLift
-            </p>
+      <section className="testimonials-section section">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2>What Our Learners Say</h2>
+            <p>Join thousands of satisfied learners who've transformed their careers</p>
           </div>
-          <div className="testimonials-grid">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard key={index} {...testimonial} />
+          <div className="testimonial-container">
+            <div className="testimonial-card card">
+              <div className="testimonial-quote">"</div>
+              <p className="testimonial-content">
+                {testimonials[currentTestimonial].content}
+              </p>
+              <div className="testimonial-author">
+                <div className="author-avatar">
+                  {testimonials[currentTestimonial].avatar}
+                </div>
+                <div className="author-info">
+                  <h4>{testimonials[currentTestimonial].name}</h4>
+                  <p>{testimonials[currentTestimonial].role}</p>
+                </div>
+              </div>
+            </div>
+            <div className="testimonial-dots">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  className={`dot ${index === currentTestimonial ? 'active' : ''}`}
+                  onClick={() => setCurrentTestimonial(index)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Preview */}
+      <section className="categories-section section">
+        <div className="container">
+          <div className="section-header text-center">
+            <h2>Explore Categories</h2>
+            <p>Discover courses across various domains and skill levels</p>
+          </div>
+          <div className="categories-grid">
+            {[
+              { name: "Technology", icon: "💻", count: "500+ courses" },
+              { name: "Business", icon: "💼", count: "300+ courses" },
+              { name: "Design", icon: "🎨", count: "200+ courses" },
+              { name: "Marketing", icon: "📈", count: "150+ courses" },
+              { name: "Data Science", icon: "📊", count: "250+ courses" },
+              { name: "Leadership", icon: "👥", count: "180+ courses" }
+            ].map((category, index) => (
+              <div key={index} className="category-card card">
+                <div className="category-icon">{category.icon}</div>
+                <h3>{category.name}</h3>
+                <p>{category.count}</p>
+                <Link to="/videos" className="category-link">Explore →</Link>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="cta-section">
-        <div className="cta-container">
-          <h2 className="cta-title">Ready to Transform Your Learning?</h2>
-          <p className="cta-subtitle">
-            Join MindLift today and start your journey toward continuous growth and development
-          </p>
-          <div className="cta-actions">
-            <button 
-              className="btn btn-primary btn-large"
-              onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
-            >
-              {isAuthenticated ? 'Continue Learning' : 'Get Started Free'}
-            </button>
-            <button 
-              className="btn btn-outline btn-large"
-              onClick={() => navigate('/features')}
-            >
-              Learn More
-            </button>
-          </div>
-          <div className="cta-note">
-            No credit card required • Cancel anytime • 100% free
+      <section className="cta-section section">
+        <div className="container">
+          <div className="cta-content card">
+            <h2>Ready to Transform Your Career?</h2>
+            <p>Join MindLift today and start your journey towards mastery and professional growth.</p>
+            <div className="cta-actions">
+              <Link to="/signup" className="btn btn-primary">
+                Get Started Free
+              </Link>
+              <span className="cta-note">No credit card required • 30-day free trial</span>
+            </div>
           </div>
         </div>
       </section>
     </div>
   );
-}
+};
 
 export default HomePage;

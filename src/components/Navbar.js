@@ -1,208 +1,176 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import './Navbar.css';
 
-function Navbar() {
-  const { isAuthenticated, isSpeaker, isAdmin, user } = useAuth();
-  const navigate = useNavigate();
+const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
-    window.location.reload();
+    logout();
+    closeMenu();
   };
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
-
-  const isActiveLink = (path) => {
+  const isActive = (path) => {
     return location.pathname === path;
   };
 
   return (
     <nav className="navbar">
-      <div className="navbar-container">
-        {/* Logo with Icon */}
-        <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
-          <span className="logo-icon">🧠</span>
-          <span className="logo-text">MindLift</span>
-        </Link>
+      <div className="container">
+        <div className="navbar-content">
+          {/* Logo */}
+          <Link to="/" className="navbar-logo" onClick={closeMenu}>
+            <span className="logo-brain">🧠</span>
+            <span className="logo-text">MindLift</span>
+          </Link>
 
-        {/* Desktop Navigation Menu */}
-        <ul className={`nav-menu ${isMobileMenuOpen ? 'nav-menu-active' : ''}`}>
-          {/* Public Navigation */}
-          <li className="nav-item">
-            <Link 
-              to="/" 
-              className={`nav-links ${isActiveLink('/') ? 'active' : ''}`}
-              onClick={closeMobileMenu}
+          {/* Desktop Navigation */}
+          <div className="navbar-links">
+            <Link
+              to="/"
+              className={`nav-link ${isActive('/') ? 'active' : ''}`}
             >
-              <span className="nav-icon">🏠</span>
               Home
             </Link>
-          </li>
-          
-          <li className="nav-item">
-            <Link 
-              to="/features" 
-              className={`nav-links ${isActiveLink('/features') ? 'active' : ''}`}
-              onClick={closeMobileMenu}
+            <Link
+              to="/videos"
+              className={`nav-link ${isActive('/videos') ? 'active' : ''}`}
             >
-              <span className="nav-icon">⭐</span>
-              Features
+              Courses
             </Link>
-          </li>
-
-          {/* User Dashboard Links */}
-          {isAuthenticated && !isSpeaker && !isAdmin && (
-            <>
-              <li className="nav-item">
-                <Link 
-                  to="/dashboard" 
-                  className={`nav-links ${isActiveLink('/dashboard') ? 'active' : ''}`}
-                  onClick={closeMobileMenu}
+            {isAuthenticated && (
+              <>
+                {user?.role === 'speaker' && (
+                  <Link
+                    to="/speaker"
+                    className={`nav-link ${isActive('/speaker') ? 'active' : ''}`}
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                <Link
+                  to="/profile"
+                  className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
                 >
-                  <span className="nav-icon">📊</span>
-                  Dashboard
+                  Profile
                 </Link>
-              </li>
-              <li className="nav-item">
-                <Link 
-                  to="/my-library" 
-                  className={`nav-links ${isActiveLink('/my-library') ? 'active' : ''}`}
-                  onClick={closeMobileMenu}
-                >
-                  <span className="nav-icon">📚</span>
-                  My Library
-                </Link>
-              </li>
-            </>
-          )}
+              </>
+            )}
+          </div>
 
-          {/* Speaker Panel */}
-          {isSpeaker && (
-            <li className="nav-item">
-              <Link 
-                to="/speaker" 
-                className={`nav-links ${isActiveLink('/speaker') ? 'active' : ''}`}
-                onClick={closeMobileMenu}
-              >
-                <span className="nav-icon">🎤</span>
-                Speaker Panel
-              </Link>
-            </li>
-          )}
-
-          {/* Admin Panel */}
-          {isAdmin && (
-            <li className="nav-item">
-              <Link 
-                to="/admin" 
-                className={`nav-links ${isActiveLink('/admin') ? 'active' : ''}`}
-                onClick={closeMobileMenu}
-              >
-                <span className="nav-icon">⚙️</span>
-                Admin Panel
-              </Link>
-            </li>
-          )}
-
-          {/* About & Contact */}
-          <li className="nav-item">
-            <Link 
-              to="/about" 
-              className={`nav-links ${isActiveLink('/about') ? 'active' : ''}`}
-              onClick={closeMobileMenu}
-            >
-              <span className="nav-icon">ℹ️</span>
-              About
-            </Link>
-          </li>
-          
-          <li className="nav-item">
-            <Link 
-              to="/contact" 
-              className={`nav-links ${isActiveLink('/contact') ? 'active' : ''}`}
-              onClick={closeMobileMenu}
-            >
-              <span className="nav-icon">📞</span>
-              Contact
-            </Link>
-          </li>
-        </ul>
-
-        {/* User Authentication Section */}
-        <div className="nav-auth-section">
-          {isAuthenticated ? (
-            <>
-              <div className="user-profile-dropdown">
-                <Link 
-                  to="/profile" 
-                  className={`user-profile-link ${isActiveLink('/profile') ? 'active' : ''}`}
-                  onClick={closeMobileMenu}
-                >
-                  <div className="user-avatar">
-                    {user?.name?.charAt(0)?.toUpperCase() || '👤'}
-                  </div>
-                  <span className="user-name">{user?.name}</span>
-                  <span className={`user-role role-${user?.role}`}>
-                    {user?.role}
+          {/* Auth Buttons */}
+          <div className="navbar-auth">
+            {isAuthenticated ? (
+              <div className="user-menu">
+                <div className="user-info">
+                  <span className="user-avatar">
+                    {user?.name?.charAt(0).toUpperCase() || 'U'}
                   </span>
+                  <span className="user-name">{user?.name || 'User'}</span>
+                </div>
+                <button onClick={handleLogout} className="btn btn-outline">
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="auth-links">
+                <Link to="/login" className="btn btn-outline">
+                  Sign In
+                </Link>
+                <Link to="/signup" className="btn btn-primary">
+                  Sign Up
                 </Link>
               </div>
-              <button 
-                onClick={handleLogout} 
-                className="logout-btn"
-                title="Logout"
-              >
-                <span className="logout-icon">🚪</span>
-                <span className="logout-text">Logout</span>
-              </button>
-            </>
-          ) : (
-            <div className="auth-buttons">
-              <Link 
-                to="/login" 
-                className="login-btn"
-                onClick={closeMobileMenu}
-              >
-                <span className="auth-icon">🔑</span>
-                Login
-              </Link>
-              <Link 
-                to="/signup" 
-                className="signup-btn"
-                onClick={closeMobileMenu}
-              >
-                <span className="auth-icon">✨</span>
-                Get Started
-              </Link>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button className="mobile-menu-btn" onClick={toggleMenu}>
+            <span className={`hamburger ${isMenuOpen ? 'open' : ''}`}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </button>
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <div className="mobile-menu-toggle" onClick={toggleMobileMenu}>
-          <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
-          <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
-          <span className={`hamburger-line ${isMobileMenuOpen ? 'active' : ''}`}></span>
+        {/* Mobile Menu */}
+        <div className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}>
+          <div className="mobile-menu-content">
+            <Link
+              to="/"
+              className={`mobile-nav-link ${isActive('/') ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              Home
+            </Link>
+            <Link
+              to="/videos"
+              className={`mobile-nav-link ${isActive('/videos') ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              Courses
+            </Link>
+            {isAuthenticated && (
+              <>
+                {user?.role === 'speaker' && (
+                  <Link
+                    to="/speaker"
+                    className={`mobile-nav-link ${isActive('/speaker') ? 'active' : ''}`}
+                    onClick={closeMenu}
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                <Link
+                  to="/profile"
+                  className={`mobile-nav-link ${isActive('/profile') ? 'active' : ''}`}
+                  onClick={closeMenu}
+                >
+                  Profile
+                </Link>
+              </>
+            )}
+            <div className="mobile-auth-section">
+              {isAuthenticated ? (
+                <>
+                  <div className="mobile-user-info">
+                    <span className="user-avatar">
+                      {user?.name?.charAt(0).toUpperCase() || 'U'}
+                    </span>
+                    <span className="user-name">{user?.name || 'User'}</span>
+                  </div>
+                  <button onClick={handleLogout} className="btn btn-outline mobile-btn">
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <div className="mobile-auth-links">
+                  <Link to="/login" className="btn btn-outline mobile-btn" onClick={closeMenu}>
+                    Sign In
+                  </Link>
+                  <Link to="/signup" className="btn btn-primary mobile-btn" onClick={closeMenu}>
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="mobile-menu-overlay" onClick={closeMobileMenu}></div>
-      )}
     </nav>
   );
-}
+};
 
 export default Navbar;

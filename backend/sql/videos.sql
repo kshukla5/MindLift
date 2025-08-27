@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS videos (
   id SERIAL PRIMARY KEY,
+  speaker_id INTEGER REFERENCES speakers(id) ON DELETE SET NULL,
   title TEXT NOT NULL,
   description TEXT,
   category TEXT,

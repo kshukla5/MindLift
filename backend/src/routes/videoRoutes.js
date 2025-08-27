@@ -19,8 +19,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.get('/videos', VideoController.list);
+router.get('/videos/:id', VideoController.getVideoById);
 router.get('/speaker/videos', authorizeRoles('speaker'), VideoController.getSpeakerVideos);
 router.post('/videos', authorizeRoles('speaker', 'admin'), upload.single('videoFile'), VideoController.create);
-router.delete('/videos/:id', VideoController.remove);
+router.patch('/videos/:id', authorizeRoles('speaker', 'admin'), VideoController.update);
+router.delete('/videos/:id', authorizeRoles('speaker', 'admin'), VideoController.remove);
 
 module.exports = router;

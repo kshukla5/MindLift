@@ -12,41 +12,67 @@ const SpeakerController = {
     }
   },
 
-  async getDashboard(req, res) {
+    async getDashboard(req, res) {
     try {
-      console.log('getDashboard called for user:', req.user.id, req.user.email);
+      console.log('getDashboard called for user:', req.user.id, req.user.email, req.user.role);
       const userId = req.user.id;
-      
-      // Auto-create speaker profile if it doesn't exist
-      let speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
-      console.log('Found speaker ID:', speakerId);
-      
-      if (!speakerId) {
-        console.log('No speaker profile found, creating one...');
-        speakerId = await SpeakerModel.ensureSpeakerRow(userId);
-        console.log('Created speaker ID:', speakerId);
+
+      // Ensure user has speaker role before proceeding
+      if (req.user.role !== 'speaker') {
+        return res.status(403).json({
+          error: 'Access denied. Speaker role required.',
+          speaker: null,
+          stats: { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0, videos_this_week: 0, videos_this_month: 0 },
+          recentVideos: [],
+        });
       }
 
-      if (!speakerId) {
-        console.error('Failed to create/find speaker profile for user:', userId);
-        return res.status(500).json({ error: 'Failed to create speaker profile' });
+      let speakerId = null;
+      try {
+        speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
+        if (!speakerId) {
+          console.log('No speaker profile found, creating one for user:', userId);
+          speakerId = await SpeakerModel.ensureSpeakerRow(userId);
+          console.log('Created speaker profile with ID:', speakerId);
+        }
+      } catch (e) {
+        console.error('Speaker profile lookup/creation failed:', e.message);
+        return res.status(500).json({
+          error: 'Failed to create speaker profile. Please try again.',
+          speaker: null,
+          stats: { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0, videos_this_week: 0, videos_this_month: 0 },
+          recentVideos: [],
+        });
       }
 
-      console.log('Fetching stats and recent videos for speaker:', speakerId);
-      const [statsRow, recent] = await Promise.all([
-        SpeakerModel.getSpeakerStats(speakerId),
-        SpeakerModel.getRecentForSpeaker(speakerId, 5),
-      ]);
+      console.log('Using speaker ID:', speakerId, 'for user:', userId);
 
-      console.log('Stats row:', statsRow);
-      console.log('Recent videos:', recent);
+      let stats = { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0, videos_this_week: 0, videos_this_month: 0 };
+      let recent = [];
+      if (speakerId) {
+        try {
+          const [statsRow, recentRows] = await Promise.all([
+            SpeakerModel.getSpeakerStats(speakerId),
+            SpeakerModel.getRecentForSpeaker(speakerId, 5),
+          ]);
 
-      const stats = {
-        totalVideos: Number(statsRow.total_videos || 0),
-        approvedVideos: Number(statsRow.approved_videos || 0),
-        pendingVideos: Number(statsRow.pending_videos || 0),
-        totalViews: 0,
-      };
+          console.log('Raw stats from DB:', statsRow);
+          console.log('Recent videos from DB:', recentRows?.length || 0, 'videos');
+
+          stats = {
+            totalVideos: Number(statsRow?.total_videos || 0),
+            approvedVideos: Number(statsRow?.approved_videos || 0),
+            pendingVideos: Number(statsRow?.pending_videos || 0),
+            totalViews: 0,
+            videos_this_week: Number(statsRow?.videos_this_week || 0),
+            videos_this_month: Number(statsRow?.videos_this_month || 0),
+          };
+          recent = recentRows || [];
+        } catch (e) {
+          console.error('Stats/recent fetch failed:', e.message, e.stack);
+          // Continue with safe defaults
+        }
+      }
 
       const response = {
         speaker: { id: speakerId, email: req.user.email, role: req.user.role },
@@ -54,12 +80,21 @@ const SpeakerController = {
         recentVideos: recent,
       };
 
-      console.log('Sending dashboard response:', response);
+      console.log('Sending dashboard response:', {
+        speaker: response.speaker,
+        stats: response.stats,
+        recentCount: response.recentVideos.length
+      });
+
       res.json(response);
     } catch (err) {
-      console.error('Speaker dashboard error:', err);
-      console.error('Stack trace:', err.stack);
-      res.status(500).json({ error: 'Failed to fetch speaker dashboard data', details: err.message });
+      console.error('Speaker dashboard error (outer):', err.message, err.stack);
+      res.status(500).json({
+        error: 'Failed to load dashboard data',
+        speaker: null,
+        stats: { totalVideos: 0, approvedVideos: 0, pendingVideos: 0, totalViews: 0, videos_this_week: 0, videos_this_month: 0 },
+        recentVideos: [],
+      });
     }
   },
 
@@ -113,6 +148,50 @@ const SpeakerController = {
       res.status(500).json({ error: 'Failed to delete speaker' });
     }
   },
+
+  // Debug endpoint for troubleshooting
+  async debugSpeakerData(req, res) {
+    try {
+      const userId = req.user.id;
+      const userRole = req.user.role;
+      const userEmail = req.user.email;
+
+      const speakerId = await SpeakerModel.getSpeakerIdByUserId(userId);
+      const speakerProfile = speakerId ? await SpeakerModel.getSpeakerById(speakerId) : null;
+
+      let stats = null;
+      let videos = [];
+      let recentVideos = [];
+
+      if (speakerId) {
+        stats = await SpeakerModel.getSpeakerStats(speakerId);
+        videos = await SpeakerModel.getRecentForSpeaker(speakerId, 10);
+        recentVideos = videos;
+      }
+
+      res.json({
+        debug: {
+          userId,
+          userRole,
+          userEmail,
+          speakerId,
+          hasSpeakerProfile: !!speakerProfile,
+          speakerProfile,
+          stats,
+          videoCount: videos.length,
+          recentVideos: recentVideos.map(v => ({
+            id: v.id,
+            title: v.title,
+            approved: v.approved,
+            created_at: v.created_at
+          }))
+        }
+      });
+    } catch (err) {
+      console.error('Debug endpoint error:', err);
+      res.status(500).json({ error: err.message, stack: err.stack });
+    }
+  }
 };
 
 module.exports = SpeakerController;
