@@ -135,6 +135,40 @@ const UserController = {
       console.error(err);
       res.status(500).json({ error: 'Failed to fetch learner dashboard' });
     }
+  },
+
+  // Debug endpoint for troubleshooting
+  async debugEnv(req, res) {
+    try {
+      const envInfo = {
+        node_env: process.env.NODE_ENV,
+        has_database_url: !!process.env.DATABASE_URL,
+        database_url_length: process.env.DATABASE_URL ? process.env.DATABASE_URL.length : 0,
+        has_pg_vars: !!(process.env.PGHOST || process.env.DB_HOST),
+        pghost: process.env.PGHOST ? '[SET]' : '[NOT SET]',
+        pguser: process.env.PGUSER ? '[SET]' : '[NOT SET]',
+        pgdatabase: process.env.PGDATABASE ? '[SET]' : '[NOT SET]',
+        jwt_secret_set: !!process.env.JWT_SECRET,
+        timestamp: new Date().toISOString()
+      };
+
+      // Test database connection
+      try {
+        const pool = require('../config/db');
+        const result = await pool.query('SELECT NOW() as current_time');
+        envInfo.db_connection = 'SUCCESS';
+        envInfo.db_time = result.rows[0].current_time;
+      } catch (dbErr) {
+        envInfo.db_connection = 'FAILED';
+        envInfo.db_error = dbErr.message;
+        envInfo.db_code = dbErr.code;
+      }
+
+      res.json(envInfo);
+    } catch (err) {
+      console.error('Debug endpoint error:', err);
+      res.status(500).json({ error: err.message });
+    }
   }
 };
 
