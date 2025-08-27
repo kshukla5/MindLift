@@ -38,11 +38,10 @@ const UserController = {
         res.status(201).json({ token });
       } catch (dbError) {
         console.error('Database error during signup:', dbError);
-        
-        // Fallback: create mock user for testing when DB is unavailable
-        const mockUserId = Math.floor(Math.random() * 1000) + 100;
-        const token = jwt.sign({ id: mockUserId, email, role: userRole }, JWT_SECRET, { expiresIn: '1h' });
-        res.status(201).json({ token });
+        return res.status(503).json({ 
+          error: 'Database temporarily unavailable. Please try again later.',
+          code: 'DATABASE_UNAVAILABLE'
+        });
       }
     } catch (err) {
       console.error(err);
@@ -72,13 +71,10 @@ const UserController = {
         res.json({ token });
       } catch (dbError) {
         console.error('Database error during login:', dbError);
-        
-        // Fallback: provide mock login for testing
-        const mockRole = email.includes('speaker') ? 'speaker' : 
-                        email.includes('admin') ? 'admin' : 'subscriber';
-        const mockUserId = Math.floor(Math.random() * 1000) + 100;
-        const token = jwt.sign({ id: mockUserId, email, role: mockRole }, JWT_SECRET, { expiresIn: '1h' });
-        res.json({ token });
+        return res.status(503).json({ 
+          error: 'Database temporarily unavailable. Please try again later.',
+          code: 'DATABASE_UNAVAILABLE'
+        });
       }
     } catch (err) {
       console.error(err);
