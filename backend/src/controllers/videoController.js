@@ -209,11 +209,8 @@ const VideoController = {
 
       try {
         const token = authHeader.slice(7);
-        const JWT_SECRET = process.env.JWT_SECRET;
-        if (!JWT_SECRET) {
-          return res.status(500).json({ error: 'Server configuration error' });
-        }
-        const payload = jwt.verify(token, JWT_SECRET);
+        const { getJwtSecret } = require('../config/jwt');
+        const payload = jwt.verify(token, getJwtSecret());
         // Admins can view any
         if (payload.role === 'admin') {
           return res.json(video);
