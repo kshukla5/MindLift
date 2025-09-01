@@ -118,26 +118,41 @@ const VideoModel = {
     return result.rows;
   },
 
-  async createVideo({ title, description, category, videoUrl, speakerId }) {
+  async createVideo({ title, description, category, videoUrl, speakerId, thumbnailUrl, durationSeconds, language = 'english', subtitleUrl, tags = [] }) {
     const result = await pool.query(
-      'INSERT INTO videos (title, description, category, video_url, speaker_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, title, description, category, video_url AS url, video_url, approved, created_at',
-      [title, description, category, videoUrl, speakerId]
+      `INSERT INTO videos (title, description, category, video_url, speaker_id, thumbnail_url, duration_seconds, language, subtitle_url, tags) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+       RETURNING id, title, description, category, video_url AS url, video_url, approved, created_at, thumbnail_url, duration_seconds, language, tags`,
+      [title, description, category, videoUrl, speakerId, thumbnailUrl, durationSeconds, language, subtitleUrl, tags]
     );
     return result.rows[0];
   },
 
-  async updateVideo(id, { title, description, category }) {
+  async updateVideo(id, { title, description, category, thumbnailUrl, durationSeconds, language, subtitleUrl, tags }) {
     const result = await pool.query(
-      'UPDATE videos SET title = COALESCE($1, title), description = COALESCE($2, description), category = COALESCE($3, category) WHERE id = $4 RETURNING id, title, description, category, video_url AS url, video_url, approved, created_at',
-      [title, description, category, id]
+      `UPDATE videos SET 
+         title = COALESCE($1, title), 
+         description = COALESCE($2, description), 
+         category = COALESCE($3, category),
+         thumbnail_url = COALESCE($4, thumbnail_url),
+         duration_seconds = COALESCE($5, duration_seconds),
+         language = COALESCE($6, language),
+         subtitle_url = COALESCE($7, subtitle_url),
+         tags = COALESCE($8, tags)
+       WHERE id = $9 
+       RETURNING id, title, description, category, video_url AS url, video_url, approved, created_at, thumbnail_url, duration_seconds, language, tags`,
+      [title, description, category, thumbnailUrl, durationSeconds, language, subtitleUrl, tags, id]
     );
     return result.rows[0];
   },
 
-  async updateVideoApproval(id, approved) {
+  async updateVideoApproval(id, approved, adminNotes = null) {
+    const timestampField = approved ? 'approved_at' : 'rejected_at';
     const result = await pool.query(
-      'UPDATE videos SET approved = $1 WHERE id = $2 RETURNING id, title, description, category, video_url AS url, video_url, approved, created_at',
-      [approved, id]
+      `UPDATE videos SET approved = $1, admin_notes = $2, ${timestampField} = CURRENT_TIMESTAMP 
+       WHERE id = $3 
+       RETURNING id, title, approved, admin_notes, approved_at, rejected_at`,
+      [approved, adminNotes, id]
     );
     return result.rows[0];
   },

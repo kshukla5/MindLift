@@ -101,16 +101,38 @@ const VideoController = {
       }
 
       console.log('Creating video with speaker ID:', speakerId);
+      
+      // Extract additional video metadata
+      const { tags = [], language = 'english', durationSeconds, thumbnailUrl, subtitleUrl } = req.body;
+      
       const video = await VideoModel.createVideo({
         title,
         description,
         category,
         videoUrl: finalVideoUrl,
         speakerId,
+        thumbnailUrl,
+        durationSeconds: durationSeconds ? parseInt(durationSeconds) : null,
+        language,
+        subtitleUrl,
+        tags: Array.isArray(tags) ? tags : (tags ? [tags] : [])
+      });
+
+      // Create notification for admin
+      const NotificationModel = require('../models/notificationModel');
+      await NotificationModel.createNotification({
+        userId: 1, // Assuming admin user ID is 1
+        type: 'video_review_needed',
+        title: 'New Video for Review',
+        message: `${req.user.name} uploaded a new video: "${title}"`,
+        data: { video_id: video.id, speaker_id: speakerId, user_id: userId }
       });
 
       console.log('Video created successfully:', video.id, video.title);
-      res.status(201).json(video);
+      res.status(201).json({
+        ...video,
+        message: 'Video uploaded successfully! It will be reviewed by our team before going live.'
+      });
     } catch (err) {
       console.error('Video upload error:', err.message, err.stack);
       res.status(500).json({ error: 'Failed to upload video', details: err.message });
