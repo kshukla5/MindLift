@@ -20,16 +20,16 @@ const Footer = () => {
               on their journey to mastery and professional growth.
             </p>
             <div className="social-links">
-              <a href="#" className="social-link" aria-label="Twitter">
+              <a href="/#" onClick={(e) => e.preventDefault()} className="social-link" aria-label="Twitter">
                 🐦
               </a>
-              <a href="#" className="social-link" aria-label="LinkedIn">
+              <a href="/#" onClick={(e) => e.preventDefault()} className="social-link" aria-label="LinkedIn">
                 💼
               </a>
-              <a href="#" className="social-link" aria-label="YouTube">
+              <a href="/#" onClick={(e) => e.preventDefault()} className="social-link" aria-label="YouTube">
                 📺
               </a>
-              <a href="#" className="social-link" aria-label="Instagram">
+              <a href="/#" onClick={(e) => e.preventDefault()} className="social-link" aria-label="Instagram">
                 📷
               </a>
             </div>
