@@ -3,14 +3,7 @@ const jwt = require('jsonwebtoken');
 const UserModel = require('../models/userModel');
 
 const allowedRoles = ['speaker', 'subscriber', 'admin'];
-
-function getJWTSecret() {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error('JWT_SECRET environment variable is not set');
-  }
-  return secret;
-}
+const { getJwtSecret } = require('../config/jwt');
 
 const UserController = {
   async list(req, res) {
@@ -26,120 +19,74 @@ const UserController = {
   async signup(req, res) {
     try {
       const { name, email, password, role } = req.body;
-
-      // Input validation
       if (!name || !email || !password) {
         return res.status(400).json({ error: 'Name, email and password are required' });
       }
 
-      // Basic email format validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: 'Invalid email format' });
-      }
-
-      // Password strength validation
-      if (password.length < 6) {
-        return res.status(400).json({ error: 'Password must be at least 6 characters long' });
-      }
-
       const userRole = allowedRoles.includes(role) ? role : 'subscriber';
-
+      
       try {
-        // Check if user already exists (case-insensitive)
-        const existing = await UserModel.findByEmail(email.toLowerCase());
+        const existing = await UserModel.findByEmail(email);
         if (existing) {
           return res.status(409).json({ error: 'User with this email already exists.' });
         }
 
-        // Hash password and create user
         const hashed = await bcrypt.hash(password, 10);
-        const user = await UserModel.createUser({
-          name: name.trim(),
-          email: email.toLowerCase(),
-          password: hashed,
-          role: userRole
-        });
+        const user = await UserModel.createUser({ name, email, password: hashed, role: userRole });
 
-              // Generate JWT token
-      const token = jwt.sign(
-        { id: user.id, email: user.email, role: user.role },
-        getJWTSecret(),
-        { expiresIn: '1h' }
-      );
-
-      console.log(`User ${email} signed up successfully with role: ${user.role}`);
-      res.status(201).json({ token });
+        const token = jwt.sign(
+          { id: user.id, email: user.email, role: user.role },
+          getJwtSecret(),
+          { expiresIn: '1h' }
+        );
+        res.status(201).json({ token });
       } catch (dbError) {
         console.error('Database error during signup:', dbError);
-        console.error('Database error details:', {
-          message: dbError.message,
-          code: dbError.code,
-          severity: dbError.severity,
-          detail: dbError.detail,
-          hint: dbError.hint
-        });
-
-        // Check if it's a connection error
-        if (dbError.code === 'ECONNREFUSED' || dbError.message?.includes('connect')) {
-          return res.status(503).json({
-            error: 'Database temporarily unavailable. Please try again in a few moments.',
-            code: 'DATABASE_UNAVAILABLE'
-          });
-        }
-
-        return res.status(500).json({
-          error: 'Unable to create account due to a database issue. Please try again.',
-          code: 'DATABASE_ERROR'
+        return res.status(503).json({ 
+          error: 'Database temporarily unavailable. Please try again later.',
+          code: 'DATABASE_UNAVAILABLE'
         });
       }
     } catch (err) {
-      console.error('Signup error:', err);
-      res.status(500).json({ error: 'Signup failed. Please try again.' });
+      console.error(err);
+      res.status(500).json({ error: 'Signup failed' });
     }
   },
 
   async login(req, res) {
     try {
       const { email, password } = req.body;
-
-      // Input validation
       if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
       }
 
-      // Basic email format validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: 'Invalid email format' });
+      try {
+        const user = await UserModel.findByEmail(email);
+        if (!user) {
+          return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const valid = await bcrypt.compare(password, user.password);
+        if (!valid) {
+          return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        const token = jwt.sign(
+          { id: user.id, email: user.email, role: user.role },
+          getJwtSecret(),
+          { expiresIn: '1h' }
+        );
+        res.json({ token });
+      } catch (dbError) {
+        console.error('Database error during login:', dbError);
+        return res.status(503).json({ 
+          error: 'Database temporarily unavailable. Please try again later.',
+          code: 'DATABASE_UNAVAILABLE'
+        });
       }
-
-      // Find user by email (case-insensitive)
-      const user = await UserModel.findByEmail(email.toLowerCase());
-      if (!user) {
-        console.log(`Failed login attempt: User ${email} not found`);
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      // Verify password
-      const valid = await bcrypt.compare(password, user.password);
-      if (!valid) {
-        console.log(`Failed login attempt: Invalid password for user ${email}`);
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      // Generate JWT token
-      const token = jwt.sign(
-        { id: user.id, email: user.email, role: user.role },
-        getJWTSecret(),
-        { expiresIn: '1h' }
-      );
-
-      console.log(`User ${email} logged in successfully with role: ${user.role}`);
-      res.json({ token });
     } catch (err) {
-      console.error('Login error:', err);
-      res.status(500).json({ error: 'Login failed. Please try again.' });
+      console.error(err);
+      res.status(500).json({ error: 'Login failed' });
     }
   },
 
@@ -196,8 +143,7 @@ const UserController = {
       console.error(err);
       res.status(500).json({ error: 'Failed to fetch learner dashboard' });
     }
-  }
-};
+  },
 
   // Debug endpoint for troubleshooting
   async debugEnv(req, res) {
