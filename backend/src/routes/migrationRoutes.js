@@ -12,11 +12,60 @@ router.post('/migrate', async (req, res) => {
       return res.status(403).json({ error: 'Unauthorized' });
     }
 
-    // Define the SQL migration directly here for reliability
-    const sql = `
--- Speaker Journey Enhancements
--- This file contains database schema enhancements for the complete Speaker journey
+    // First, create base schema if needed
+    const baseSchema = `
+-- Base schema for MindLift
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  role TEXT NOT NULL,
+  is_paid BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+CREATE TABLE IF NOT EXISTS speakers (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  bio TEXT,
+  photo TEXT,
+  socials JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS videos (
+  id SERIAL PRIMARY KEY,
+  speaker_id INTEGER REFERENCES speakers(id) ON DELETE SET NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  category TEXT,
+  video_url TEXT NOT NULL,
+  approved BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS bookmarks (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  video_id INTEGER REFERENCES videos(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, video_id)
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  amount NUMERIC(10,2) NOT NULL,
+  stripe_id TEXT NOT NULL,
+  status TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+    `;
+
+    // Then apply enhancements
+    const enhancements = `
+-- Speaker Journey Enhancements
 -- Add new fields to users table for better profile management
 ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token TEXT;
@@ -49,10 +98,10 @@ ALTER TABLE videos ADD COLUMN IF NOT EXISTS rejected_at TIMESTAMP;
 CREATE TABLE IF NOT EXISTS notifications (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  type TEXT NOT NULL, -- 'email_verification', 'speaker_approved', 'video_approved', 'milestone', etc.
+  type TEXT NOT NULL,
   title TEXT NOT NULL,
   message TEXT NOT NULL,
-  data JSONB, -- Additional data like video_id, milestone_count, etc.
+  data JSONB,
   read BOOLEAN DEFAULT FALSE,
   email_sent BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -63,7 +112,7 @@ CREATE TABLE IF NOT EXISTS video_analytics (
   id SERIAL PRIMARY KEY,
   video_id INTEGER REFERENCES videos(id) ON DELETE CASCADE,
   user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-  event_type TEXT NOT NULL, -- 'view', 'like', 'complete', 'share'
+  event_type TEXT NOT NULL,
   session_id TEXT,
   ip_address INET,
   user_agent TEXT,
@@ -74,9 +123,9 @@ CREATE TABLE IF NOT EXISTS video_analytics (
 CREATE TABLE IF NOT EXISTS speaker_milestones (
   id SERIAL PRIMARY KEY,
   speaker_id INTEGER REFERENCES speakers(id) ON DELETE CASCADE,
-  milestone_type TEXT NOT NULL, -- 'first_video', 'views_1000', 'videos_10', etc.
+  milestone_type TEXT NOT NULL,
   achieved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  data JSONB -- Additional data like view_count, video_count, etc.
+  data JSONB
 );
 
 -- Indexes for better performance
@@ -103,12 +152,16 @@ WHERE id IN (
 );
     `;
 
-    // Execute the SQL
-    await pool.query(sql);
+    // Execute base schema first
+    await pool.query(baseSchema);
+    
+    // Then execute enhancements
+    await pool.query(enhancements);
 
     res.json({
       success: true,
       message: 'Database schema migration completed successfully',
+      applied: ['base_schema', 'speaker_enhancements'],
       timestamp: new Date().toISOString()
     });
   } catch (err) {
