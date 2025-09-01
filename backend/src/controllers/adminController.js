@@ -3,6 +3,7 @@ const SpeakerModel = require('../models/speakerModel');
 const VideoModel = require('../models/videoModel');
 const UserModel = require('../models/userModel');
 const NotificationModel = require('../models/notificationModel');
+const emailService = require('../services/emailService');
 
 const AdminController = {
   async getStats(req, res) {
@@ -79,10 +80,19 @@ const AdminController = {
         return res.status(404).json({ error: 'Speaker not found' });
       }
 
+      // Get user details for email
+      const user = await UserModel.getUserById(speaker.user_id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
       await SpeakerModel.updateSpeakerApproval(speakerId, 'approved', adminNotes);
 
       // Notify speaker of approval
       await NotificationModel.notifySpeakerApproved(speaker.user_id, speakerId);
+
+      // Send approval email
+      await emailService.sendSpeakerApprovalEmail(user.email, user.name);
 
       res.json({
         success: true,
@@ -109,10 +119,19 @@ const AdminController = {
         return res.status(404).json({ error: 'Speaker not found' });
       }
 
+      // Get user details for email
+      const user = await UserModel.getUserById(speaker.user_id);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
       await SpeakerModel.updateSpeakerApproval(speakerId, 'rejected', adminNotes || reason);
 
       // Notify speaker of rejection
       await NotificationModel.notifySpeakerRejected(speaker.user_id, reason);
+
+      // Send rejection email
+      await emailService.sendSpeakerRejectionEmail(user.email, user.name, reason);
 
       res.json({
         success: true,

@@ -3,6 +3,7 @@ const router = express.Router();
 const SpeakerModel = require('../models/speakerModel');
 const UserModel = require('../models/userModel');
 const NotificationModel = require('../models/notificationModel');
+const emailService = require('../services/emailService');
 const authMiddleware = require('../middleware/authMiddleware');
 const multer = require('multer');
 const path = require('path');
@@ -239,6 +240,13 @@ const SpeakerOnboardingController = {
         message: `${req.user.name} has submitted their speaker profile for review.`,
         data: { speaker_id: speakerId, user_id: userId }
       });
+
+      // Send welcome email to speaker
+      await emailService.sendSpeakerWelcomeEmail(req.user.email, req.user.name);
+
+      // Send admin notification email (assuming admin email is set)
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@mindlift.com';
+      await emailService.sendAdminNotificationEmail(adminEmail, req.user.name, req.user.email);
 
       res.json({
         success: true,
