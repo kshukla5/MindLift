@@ -124,6 +124,14 @@ WHERE id IN (
 // Check migration status
 router.get('/migration-status', async (req, res) => {
   try {
+    // Check what tables exist
+    const allTables = await pool.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public'
+      ORDER BY table_name
+    `);
+
     // Check if enhanced tables exist
     const checkTables = await pool.query(`
       SELECT table_name 
@@ -132,23 +140,25 @@ router.get('/migration-status', async (req, res) => {
       AND table_name IN ('notifications', 'video_analytics', 'speaker_milestones')
     `);
 
-    // Check if enhanced columns exist
-    const checkColumns = await pool.query(`
-      SELECT column_name, table_name
-      FROM information_schema.columns 
+    // Check if base tables exist
+    const baseTables = await pool.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
       WHERE table_schema = 'public' 
       AND table_name IN ('users', 'speakers', 'videos')
-      AND column_name IN ('approval_status', 'full_name', 'areas_of_expertise', 'thumbnail_url', 'tags')
     `);
 
-    const tablesExist = checkTables.rows.map(r => r.table_name);
-    const columnsExist = checkColumns.rows.map(r => `${r.table_name}.${r.column_name}`);
+    const existingTables = allTables.rows.map(r => r.table_name);
+    const baseTablesExist = baseTables.rows.map(r => r.table_name);
+    const enhancedTablesExist = checkTables.rows.map(r => r.table_name);
 
     res.json({
       status: 'checked',
-      enhanced_tables: tablesExist,
-      enhanced_columns: columnsExist,
-      migration_needed: tablesExist.length < 3 || columnsExist.length < 5,
+      all_tables: existingTables,
+      base_tables: baseTablesExist,
+      enhanced_tables: enhancedTablesExist,
+      missing_base_tables: ['users', 'speakers', 'videos'].filter(t => !baseTablesExist.includes(t)),
+      migration_needed: baseTablesExist.length < 3 || enhancedTablesExist.length < 3,
       timestamp: new Date().toISOString()
     });
   } catch (err) {
