@@ -14,6 +14,7 @@ const bookmarkRoutes = require('./routes/bookmarkRoutes');
 const videoRoutes = require('./routes/videoRoutes');
 const userRoutes = require('./routes/userRoutes');
 const emailTestRoutes = require('./routes/emailTestRoutes');
+const migrationRoutes = require('./routes/migrationRoutes');
 
 // CORS configuration (dynamic for Railway + Vercel)
 const defaultAllowedOrigins = [
@@ -140,6 +141,7 @@ app.use('/api', bookmarkRoutes);
 app.use('/api', videoRoutes);
 app.use('/api', userRoutes);
 app.use('/api/email', emailTestRoutes);
+app.use('/api/db', migrationRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
